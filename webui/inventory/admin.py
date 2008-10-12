@@ -17,6 +17,7 @@ class EntryAdmin(admin.ModelAdmin):
 	ordering = ['time']
 
 class LocationAdmin(admin.ModelAdmin):
+	form = LocationForm
 	list_display = ('name', 'code')
 
 class NotificationAdmin(admin.ModelAdmin):
@@ -31,6 +32,7 @@ class ReportAdmin(admin.ModelAdmin):
 	radio_fields = {'supply' : admin.HORIZONTAL}
 
 class SupplyAdmin(admin.ModelAdmin):
+	form = SupplyForm
 	list_display = ('name', 'code')
 
 class SupplyLocationAdmin(admin.ModelAdmin):
