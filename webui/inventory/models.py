@@ -79,7 +79,7 @@ class Entry(models.Model):
 
 	def __unicode__(self):
 		return "%s report for %s on %s" %\
-		(self.supply.name, self.location, self.time)
+		(self.supply_location, self.time)
 	
 	class Meta:
 		verbose_name_plural="Entries"
