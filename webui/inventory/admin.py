@@ -16,4 +16,6 @@ admin.site.register(Supply)
 admin.site.register(Location)
 admin.site.register(SupplyLocation)
 admin.site.register(Notification)
+admin.site.register(Report)
+admin.site.register(Entry)
 

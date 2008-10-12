@@ -35,7 +35,7 @@ class Location(models.Model):
 class SupplyLocation(models.Model):
 	supply = models.ForeignKey(Supply)
 	location = models.ForeignKey(Location)
-	quantity = models.IntegerField(null=True, blank=True) # null=UNKNOWN
+	quantity = models.PositiveIntegerField(blank=True)
 	
 	def __unicode__(self):
 		return "%s at %s" %\
@@ -54,3 +54,32 @@ class Notification(models.Model):
 		return "%s by %s" %\
 		(self.time, self.reporter)
 
+class Report(models.Model):
+	supply = models.ForeignKey(Supply)
+	begin_date = models.DateField(auto_now_add=True)
+	end_date = models.DateField(auto_now=True)
+
+	def __unicode__(self):
+		return "%s report" % self.supply.name
+	
+	def _get_latest_entry(self):
+		return Entry.objects.order_by('time')[0]
+
+	latest_entry = property(_get_latest_entry)
+
+class Entry(models.Model):
+	report = models.ForeignKey(Report)
+	reporter = models.ForeignKey(Reporter)
+	supply_location = models.ForeignKey(SupplyLocation)	
+	time = models.DateTimeField(auto_now_add=True)
+	beneficiaries = models.PositiveIntegerField()
+	quantity = models.PositiveIntegerField()
+	consumption = models.PositiveIntegerField()
+	balance = models.PositiveIntegerField()
+
+	def __unicode__(self):
+		return "%s on %s" %\
+		(self.supply_location, self.time)
+	
+	class Meta:
+		verbose_name_plural="Entries"
