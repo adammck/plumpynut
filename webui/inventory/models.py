@@ -54,16 +54,17 @@ class Notification(models.Model):
 		(self.time, self.reporter)
 
 class Report(models.Model):
-	reporters = models.ManyToManyField(Reporter)
 	supply = models.ForeignKey(Supply)
+	begin_date = models.DateField(auto_now_add=True)
+	end_date = models.DateField(auto_now=True)
 
 	def __unicode__(self):
 		return "%s report" % self.supply.name
 
 class Entry(models.Model):
+	report = models.ForeignKey(Report)
 	reporter = models.ForeignKey(Reporter)
-	supply = models.ForeignKey(Supply)
-	location = models.ForeignKey(Location)
+	supply_location = models.ForeignKey(SupplyLocation)	
 	time = models.DateTimeField(auto_now_add=True)
 	beneficiaries = models.PositiveIntegerField()
 	quantity = models.PositiveIntegerField()
