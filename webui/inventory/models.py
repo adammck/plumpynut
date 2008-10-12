@@ -75,7 +75,8 @@ class Entry(models.Model):
 	beneficiaries = models.PositiveIntegerField(help_text="Number of benficiaries")
 	quantity = models.PositiveIntegerField(help_text="Quantity")
 	consumption = models.PositiveIntegerField(help_text="Consumption quantity")
-	balance = models.PositiveIntegerField(help_text="Balance at OTP quantity")
+	otp_balance = models.PositiveIntegerField(help_text="Balance at OTP quantity")
+	woreda_balance = models.PositiveIntegerField(help_text="Balance at woreda quantity")
 
 	def __unicode__(self):
 		return "%s on %s" %\
