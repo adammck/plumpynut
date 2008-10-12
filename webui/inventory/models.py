@@ -68,14 +68,14 @@ class Report(models.Model):
 	latest_entry = property(_get_latest_entry)
 
 class Entry(models.Model):
-	report = models.ForeignKey(Report)
-	reporter = models.ForeignKey(Reporter)
-	supply_location = models.ForeignKey(SupplyLocation)	
+	report = models.ForeignKey(Report, help_text="Supply report")
+	reporter = models.ForeignKey(Reporter, help_text="Field monitor")
+	supply_location = models.ForeignKey(SupplyLocation, help_text="Reporting location")
 	time = models.DateTimeField(auto_now_add=True)
-	beneficiaries = models.PositiveIntegerField()
-	quantity = models.PositiveIntegerField()
-	consumption = models.PositiveIntegerField()
-	balance = models.PositiveIntegerField()
+	beneficiaries = models.PositiveIntegerField(help_text="Number of benficiaries")
+	quantity = models.PositiveIntegerField(help_text="Quantity")
+	consumption = models.PositiveIntegerField(help_text="Consumption quantity")
+	balance = models.PositiveIntegerField(help_text="Balance at OTP quantity")
 
 	def __unicode__(self):
 		return "%s on %s" %\
