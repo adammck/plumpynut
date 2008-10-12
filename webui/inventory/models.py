@@ -78,7 +78,7 @@ class Entry(models.Model):
 	balance = models.PositiveIntegerField()
 
 	def __unicode__(self):
-		return "%s report for %s on %s" %\
+		return "%s on %s" %\
 		(self.supply_location, self.time)
 	
 	class Meta:
