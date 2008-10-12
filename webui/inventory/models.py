@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+# vim: noet
+
 from django.db import models
 
 class Reporter(models.Model):
 	first_name = models.CharField(max_length=50)
 	last_name = models.CharField(max_length=50)
-	alias = models.CharField(max_length=16)
+	alias = models.CharField(max_length=16, unique=True)
 	phone = models.CharField(max_length=30)
 	email = models.EmailField(blank=True)
 
