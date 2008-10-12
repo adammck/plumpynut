@@ -75,6 +75,20 @@ class App(SmsApplication):
 			self.send(caller, "Sorry, I don't know anyone called %s" % (alias))
 
 
+	# WHO AM I
+	@kw("who am i", "whoami")
+	def whoami(self, caller):
+		
+		# attempt to find a reporter matching the
+		# caller's phone number, and remind them
+		try:
+			reporter = Reporter.objects.get(phone=caller)
+			self.send(caller, "You are %s" % (reporter))
+		
+		except ObjectDoesNotExist:
+			self.send(caller, "Sorry, I don't know who you are")
+
+
 	# FLAG <NOTICE>
 	@kw("flag (.+)")
 	def flag(self, caller, notice):
