@@ -15,4 +15,5 @@ admin.site.register(Reporter, ReporterAdmin)
 admin.site.register(Supply)
 admin.site.register(Location)
 admin.site.register(SupplyLocation)
+admin.site.register(Notification)
 

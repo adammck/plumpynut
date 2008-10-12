@@ -20,7 +20,7 @@ from webui.inventory.models import *
 class App(SmsApplication):
 	kw = SmsKeywords()
 	
-	# IDENTIFY <NAME>
+	# IDENTIFY <ALIAS>
 	@kw("identify (letters)", "this is (letters)", "i am (letters)")
 	def identify(self, caller, alias):
 
@@ -60,6 +60,7 @@ class App(SmsApplication):
 		reporter.save()
 	
 	
+	# WHO <ALIAS>
 	@kw("who is (letters)", "who (letters)", "(letters)\?")
 	def who(self, caller, alias):
 		
@@ -72,11 +73,20 @@ class App(SmsApplication):
 			
 		except ObjectDoesNotExist:
 			self.send(caller, "Sorry, I don't know anyone called %s" % (alias))
-		
-	
-	
 
-		
+
+	# FLAG <NOTICE>
+	@kw("flag (.+)")
+	def flag(self, caller, notice):
+		try:
+			r = Reporter.objects.get(phone=caller)
+			n = Notification.objects.create(reporter=r, resolved="False", notice=notice)
+			self.send(caller, "Notice received")
+
+		except ObjectAssertionError:
+			self.send(caller, "Error: Please identify yourself before flagging")
+
+
 	# nothing matched
 	def incoming_sms(self, caller, msg):
 		self.send(caller, "ERROR")

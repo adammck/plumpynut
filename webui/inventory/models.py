@@ -37,3 +37,13 @@ class SupplyLocation(models.Model):
 		return "%s at %s" %\
 		(self.supply.name, self.location.name)
 
+class Notification(models.Model):
+	reporter = models.ForeignKey(Reporter)
+	time = models.DateTimeField(auto_now_add=True)
+	notice = models.CharField(max_length=160)
+	resolved = models.BooleanField()
+	
+	def __unicode__(self):
+		return "%s by %s" %\
+		(self.time, self.reporter)
+
