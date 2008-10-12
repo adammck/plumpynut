@@ -78,7 +78,7 @@ class Entry(models.Model):
 
 	def __unicode__(self):
 		return "%s on %s" %\
-		(self.supply_location, self.time)
+		(self.supply_location, self.time.strftime("%d/%m/%y"))
 	
 	class Meta:
 		verbose_name_plural="Entries"
