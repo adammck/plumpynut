@@ -7,7 +7,7 @@ class Reporter(models.Model):
 	first_name = models.CharField(max_length=50)
 	last_name = models.CharField(max_length=50)
 	alias = models.CharField(max_length=16, unique=True)
-	phone = models.CharField(max_length=30, unique=True)
+	phone = models.CharField(max_length=30, blank=True)
 	email = models.EmailField(blank=True)
 
 	def __unicode__(self):
@@ -35,7 +35,7 @@ class Location(models.Model):
 class SupplyLocation(models.Model):
 	supply = models.ForeignKey(Supply)
 	location = models.ForeignKey(Location)
-	quantity = models.IntegerField()
+	quantity = models.IntegerField(null=True, blank=True) # null=UNKNOWN
 	
 	def __unicode__(self):
 		return "%s at %s" %\
