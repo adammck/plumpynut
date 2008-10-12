@@ -13,6 +13,7 @@ class ReporterAdmin(admin.ModelAdmin):
 # add our models to the django admin
 admin.site.register(Reporter, ReporterAdmin)
 admin.site.register(Supply)
+admin.site.register(Area)
 admin.site.register(Location)
 admin.site.register(SupplyLocation)
 admin.site.register(Notification)

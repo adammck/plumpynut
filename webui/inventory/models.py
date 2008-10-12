@@ -25,10 +25,17 @@ class Supply(models.Model):
 	class Meta:
 		verbose_name_plural="Supplies"
 
+class Area(models.Model):
+	name = models.CharField(max_length=100)
+	
+	def __unicode__(self):
+		return self.name
+
 class Location(models.Model):
 	name = models.CharField(max_length=100)
 	code = models.CharField(max_length=4)
-
+	area = models.ForeignKey(Area)
+	
 	def __unicode__(self):
 		return self.name
 
