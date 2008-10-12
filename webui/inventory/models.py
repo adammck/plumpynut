@@ -68,14 +68,13 @@ class Report(models.Model):
 	latest_entry = property(_get_latest_entry)
 
 class Entry(models.Model):
-	report = models.ForeignKey(Report)
 	reporter = models.ForeignKey(Reporter)
 	supply_location = models.ForeignKey(SupplyLocation)	
 	time = models.DateTimeField(auto_now_add=True)
-	beneficiaries = models.PositiveIntegerField()
-	quantity = models.PositiveIntegerField()
-	consumption = models.PositiveIntegerField()
-	balance = models.PositiveIntegerField()
+	beneficiaries = models.PositiveIntegerField(blank=True, null=True)
+	quantity = models.PositiveIntegerField(blank=True, null=True)
+	consumption = models.PositiveIntegerField(blank=True, null=True)
+	balance = models.PositiveIntegerField(blank=True, null=True)
 
 	def __unicode__(self):
 		return "%s on %s" %\
@@ -83,3 +82,4 @@ class Entry(models.Model):
 	
 	class Meta:
 		verbose_name_plural="Entries"
+
