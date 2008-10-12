@@ -102,7 +102,7 @@ class App(SmsApplication):
 	
 	# SUPPLIES
 	@kw("supplies", "supplys", "sups")
-	def locations(self, caller):
+	def supplies(self, caller):
 		all_sup = Supply.objects.all()
 		flat_sup = ["%s: %s" % (s.code, s.name) for s in all_sup]
 		self.send(caller, "\n".join(flat_sup))
