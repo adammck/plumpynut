@@ -16,9 +16,12 @@ class EntryAdmin(admin.ModelAdmin):
 	date_hierarchy = 'time'
 	ordering = ['time']
 
+class AreaAdmin(admin.ModelAdmin):
+	pass
+
 class LocationAdmin(admin.ModelAdmin):
 	form = LocationForm
-	list_display = ('name', 'code')
+	list_display = ('area', 'name', 'code')
 
 class NotificationAdmin(admin.ModelAdmin):
 	list_display = ('reporter', 'time', 'resolved', 'notice')
@@ -43,9 +46,9 @@ class SupplyLocationAdmin(admin.ModelAdmin):
 # add our models to the django admin
 admin.site.register(Reporter, ReporterAdmin)
 admin.site.register(Supply, SupplyAdmin)
+admin.site.register(Area, AreaAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(SupplyLocation, SupplyLocationAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Report, ReportAdmin)
 admin.site.register(Entry, EntryAdmin)
-
