@@ -63,7 +63,7 @@ class Report(models.Model):
 		return "%s report" % self.supply.name
 	
 	def _get_latest_entry(self):
-		return Entry.objects.order_by('time)[0]
+		return Entry.objects.order_by('time')[0]
 
 	latest_entry = property(_get_latest_entry)
 
