@@ -63,18 +63,18 @@ class Report(models.Model):
 		return "%s report" % self.supply.name
 	
 	def _get_latest_entry(self):
-		return Entry.objects.order_by('time')[0]
+		return Entry.objects.order_by('-time')[0]
 
 	latest_entry = property(_get_latest_entry)
 
 class Entry(models.Model):
-	reporter = models.ForeignKey(Reporter)
-	supply_location = models.ForeignKey(SupplyLocation)	
+	reporter = models.ForeignKey(Reporter, help_text="Field monitor")
+	supply_location = models.ForeignKey(SupplyLocation, help_text="Reporting location")
 	time = models.DateTimeField(auto_now_add=True)
-	beneficiaries = models.PositiveIntegerField(blank=True, null=True)
-	quantity = models.PositiveIntegerField(blank=True, null=True)
-	consumption = models.PositiveIntegerField(blank=True, null=True)
-	balance = models.PositiveIntegerField(blank=True, null=True)
+	beneficiaries = models.PositiveIntegerField(blank=True, null=True, help_text="Number of benficiaries")
+	quantity = models.PositiveIntegerField(blank=True, null=True, help_text="Quantity")
+	consumption = models.PositiveIntegerField(blank=True, null=True, help_text="Consumption quantity")
+	balance = models.PositiveIntegerField(blank=True, null=True, help_text="Balance at OTP quantity")
 
 	def __unicode__(self):
 		return "%s on %s" %\

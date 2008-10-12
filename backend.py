@@ -164,7 +164,6 @@ class App(SmsApplication):
 
 
 
-
 	# nothing matched
 	def incoming_sms(self, caller, msg):
 		self.send(caller, "ERROR")
