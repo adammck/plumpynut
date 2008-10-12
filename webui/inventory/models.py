@@ -14,6 +14,11 @@ class Reporter(models.Model):
 		ph = self.phone or "unknown"
 		return "%s %s [%s]" %\
 			(self.first_name, self.last_name, ph)
+	
+	def _get_full_name(self):
+		return "%s %s" % (self.first_name, self.last_name)
+	
+	full_name = property(_get_full_name)
 
 class Supply(models.Model):
 	name = models.CharField(max_length=100)
@@ -59,7 +64,7 @@ class Notification(models.Model):
 	
 	def __unicode__(self):
 		return "%s by %s" %\
-		(self.time, self.reporter)
+		(self.time.strftime("%d/%m/%y"), self.reporter)
 
 class Report(models.Model):
 	supply = models.ForeignKey(Supply)

@@ -93,12 +93,12 @@ class App(SmsApplication):
 
 
 	# FLAG <NOTICE>
-	@kw("flag (.+)")
-	def flag(self, caller, notice):
-		r = self.__identify(caller, "flagging")
-		n = Notification.objects.create(reporter=r, resolved="False", notice=notice)
+	@kw("flag", "flag (.+)")
+	def flag(self, caller, notice=None):
+		reporter = self.__identify(caller, "flagging")
+		Notification.objects.create(reporter=reporter, resolved="False", notice=notice)
 		self.send(caller, "Notice received")
-	
+
 	
 	# SUPPLIES
 	@kw("supplies", "supplys", "sups")
@@ -116,7 +116,30 @@ class App(SmsApplication):
 		self.send(caller, "\n".join(flat_loc))
 
 
-	# <SUPPLY> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> <WOREDA-BALANCE>
+	# HELP <QUERY> <CODE>
+	@kw("help", "help (letters)", "help (letters) (letters)")
+	def help(self, caller, query=None, code=None):
+		if(query):
+			if(query == "codes"):
+				supplies = Supply.objects.all()
+				msg = ["%s: %s" % (s.name, s.code) for s in supplies]
+				self.send(caller,msg)
+
+			if(query == "flags"):
+				msg = "Send 'flag' followed by a notice that will be reviewed by HQ. Please include your location, if applicable."
+				self.send(caller,msg)
+
+			if(code):
+				if(query == "format"):
+					if(code.upper() == "PN"):
+						msg = "<SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE>"
+						self.send(caller,msg)
+		else:
+			msg = "UNICEF supply monitoring system help options: help codes, help format <code>, help flags"
+			self.send(caller, msg)
+
+
+	# <SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> 
 	# pn gdo 7 20
 	@kw("([a-z]{1,4}) ([a-z]{1,4})(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
 	def report(self, caller, sup_code, loc_code, ben=None, qty=None, con=None, bal=None):
@@ -125,12 +148,12 @@ class App(SmsApplication):
 		rep = self.__identify(caller, "reporting")
 		
 		# validate + fetch the supply
-		sup = self.__get(Supply, code=sup_code)
+		sup = self.__get(Supply, code=sup_code.upper())
 		if not sup: raise CallerError(
 			"Invalid supply code: %s" % (sup_code))
 		
 		# ...and the location
-		loc = self.__get(Location, code=loc_code)
+		loc = self.__get(Location, code=loc_code.upper())
 		if not loc: raise CallerError(
 			"Invalid location code: %s" % (loc_code))
 		
