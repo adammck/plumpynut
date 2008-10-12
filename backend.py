@@ -96,7 +96,7 @@ class App(SmsApplication):
 	@kw("flag", "flag (.+)")
 	def flag(self, caller, notice=None):
 		reporter = self.__identify(caller, "flagging")
-		n = Notification.objects.create(reporter=reporter, resolved="False", notice=notice)
+		Notification.objects.create(reporter=reporter, resolved="False", notice=notice)
 		self.send(caller, "Notice received")
 
 	
@@ -132,14 +132,14 @@ class App(SmsApplication):
 			if(code):
 				if(query == "format"):
 					if(code.upper() == "PN"):
-						msg = "<SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> <WOREDA-BALANCE>"
+						msg = "<SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE>"
 						self.send(caller,msg)
 		else:
 			msg = "UNICEF supply monitoring system help options: help codes, help format <code>, help flags"
 			self.send(caller, msg)
 
 
-	# <SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> <WOREDA-BALANCE>
+	# <SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> 
 	# pn gdo 7 20
 	@kw("([a-z]{1,4}) ([a-z]{1,4})(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
 	def report(self, caller, sup_code, loc_code, ben=None, qty=None, con=None, bal=None):
@@ -148,12 +148,12 @@ class App(SmsApplication):
 		rep = self.__identify(caller, "reporting")
 		
 		# validate + fetch the supply
-		sup = self.__get(Supply, code=sup_code)
+		sup = self.__get(Supply, code=sup_code.upper())
 		if not sup: raise CallerError(
 			"Invalid supply code: %s" % (sup_code))
 		
 		# ...and the location
-		loc = self.__get(Location, code=loc_code)
+		loc = self.__get(Location, code=loc_code.upper())
 		if not loc: raise CallerError(
 			"Invalid location code: %s" % (loc_code))
 		
