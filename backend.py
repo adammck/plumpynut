@@ -87,13 +87,10 @@ class App(SmsApplication):
 	# FLAG <NOTICE>
 	@kw("flag (.+)")
 	def flag(self, caller, notice):
-		try:
-			r = Reporter.objects.get(phone=caller)
-			n = Notification.objects.create(reporter=r, resolved="False", notice=notice)
-			self.send(caller, "Notice received")
-
-		except ObjectAssertionError:
-			self.send(caller, "Error: Please identify yourself before flagging")
+		reporter = self.__get_reporter(phone=caller)
+		n = Notification.objects.create(reporter=reporter,\
+		resolved="False", notice=notice)
+		self.send(caller, "Notice received")
 
 
 	# nothing matched
