@@ -20,6 +20,9 @@ class Supply(models.Model):
 
 	def __unicode__(self):
 		return self.name
+	
+	class Meta:
+		verbose_name_plural="Supplies"
 
 class Location(models.Model):
 	name = models.CharField(max_length=100)
@@ -36,6 +39,9 @@ class SupplyLocation(models.Model):
 	def __unicode__(self):
 		return "%s at %s" %\
 		(self.supply.name, self.location.name)
+
+	class Meta:
+		verbose_name_plural="Supplies per Location"
 
 class Notification(models.Model):
 	reporter = models.ForeignKey(Reporter)
