@@ -21,22 +21,70 @@ class App(SmsApplication):
 	kw = SmsKeywords()
 	
 	# IDENTIFY <NAME>
-	@kw("identify (slug)")
+	@kw("identify (letters)", "this is (letters)", "i am (letters)")
 	def identify(self, caller, alias):
+
+		# attempt to find the reporter by his/her alias,
+		# and notify them that they were recognized
 		try:
-			r = Reporter.objects.get(alias=alias)
-			self.send(caller, "Hello, %s" % r)
+			reporter = Reporter.objects.get(alias=alias)
+			self.send(caller, "Hello, %s" % reporter)
 			
 		except ObjectDoesNotExist:
-			self.send(caller, "Error: There is no such reporter as '%s'" % (alias))
+			self.send(caller, "Sorry, I don't know anyone called %s" % (alias))
+			self.log("Unknown alias: %s" % (alias), "warn")
+			return
+		
+		
+		# if this reported is already associated
+		# with this number, there's nothing to do
+		if reporter.phone == caller:
+			return
+		
+		
+		# if anyone else is currently identified
+		# by this number, then disassociate them
+		try:
+			prev = Reporter.objects.get(phone=caller)
+			if prev.pk != reporter.pk:
+				self.log("%s is no longer %s" % (prev, caller))
+				prev.phone = ""
+				prev.save()
+		
+		except ObjectDoesNotExist:
+			pass
+		
+		
+		# associate the reporter with this number
+		reporter.phone = caller
+		reporter.save()
+	
+	
+	@kw("who is (letters)", "who (letters)", "(letters)\?")
+	def who(self, caller, alias):
+		
+		# attempt to find a reporter by that alias
+		# and return their details to the caller
+		try:
+			reporter = Reporter.objects.get(alias=alias)
+			number = reporter.phone or "no number"
+			self.send(caller, "%s is %s [%s]" % (alias, reporter, number))
+			
+		except ObjectDoesNotExist:
+			self.send(caller, "Sorry, I don't know anyone called %s" % (alias))
+		
+	
+	
 
-	# nothing matched	
+		
+	# nothing matched
 	def incoming_sms(self, caller, msg):
 		self.send(caller, "ERROR")
 
 
 app = App(backend=kannel, sender_args=["user", "pass"])
 app.run()
+
 
 # wait for interrupt
 while True: time.sleep(1)
