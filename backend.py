@@ -99,7 +99,24 @@ class App(SmsApplication):
 		n = Notification.objects.create(reporter=reporter, resolved="False", notice=notice)
 		self.send(caller, "Notice received")
 
-	# HELP!
+	
+	# SUPPLIES
+	@kw("supplies", "supplys", "sups")
+	def locations(self, caller):
+		all_sup = Supply.objects.all()
+		flat_sup = ["%s: %s" % (s.code, s.name) for s in all_sup]
+		self.send(caller, "\n".join(flat_sup))
+	
+	
+	# LOCATIONS
+	@kw("locations", "locs")
+	def locations(self, caller):
+		all_loc = Location.objects.all()
+		flat_loc = ["%s: %s" % (l.code, l.name) for l in all_loc]
+		self.send(caller, "\n".join(flat_loc))
+
+
+	# HELP <QUERY> <CODE>
 	@kw("help", "help (letters)", "help (letters) (letters)")
 	def help(self, caller, query=None, code=None):
 		if(query):
@@ -124,11 +141,11 @@ class App(SmsApplication):
 
 	# <SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> <WOREDA-BALANCE>
 	# pn gdo 7 20
-	@kw("(letters) (letters) (numbers) (numbers)")
-	def report(self, caller, sup_code, loc_code, benef, qty):
+	@kw("([a-z]{1,4}) ([a-z]{1,4})(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
+	def report(self, caller, sup_code, loc_code, ben=None, qty=None, con=None, bal=None):
 		
 		# ensure that the caller is known
-		reporter = self.__identify(caller, "reporting")
+		rep = self.__identify(caller, "reporting")
 		
 		# validate + fetch the supply
 		sup = self.__get(Supply, code=sup_code)
@@ -142,9 +159,31 @@ class App(SmsApplication):
 		
 		# fetch the supplylocation object, to update the current stock
 		# levels. if it doesn't already exist, just create it, because
-		# the administrators probably won't want to add every supply
-		# to every location...
-		sl = SupplyLocation.objects.get_or_create(supply=sup, location=loc)
+		# the administrators probably won't want to add them all...
+		sl, created = SupplyLocation.objects.get_or_create(supply=sup, location=loc)
+		
+		# create the entry object, with
+		# no proper validation (todo!)
+		Entry.objects.create(
+			reporter=rep,
+			supply_location=sl,
+			beneficiaries=ben,
+			quantity=qty,
+			consumption=con,
+			balance=bal)
+		
+		# collate all of the information submitted, to
+		# be sent back and checked by the caller
+		info = [
+			"ben=%s" % (ben or "??"),
+			"qty=%s" % (qty or "??"),
+			"con=%s" % (con or "??"),
+			"bal=%s" % (bal or "??")]
+		
+		# notify the caller of their new entry
+		self.send(caller,
+			"Received %s report for %s by %s.\n%s\nIf this is not correct, reply with CANCEL" %\
+			(sup.name, loc.name, rep, ", ".join(info)))
 
 
 

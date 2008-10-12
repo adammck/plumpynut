@@ -68,19 +68,18 @@ class Report(models.Model):
 	latest_entry = property(_get_latest_entry)
 
 class Entry(models.Model):
-	report = models.ForeignKey(Report, help_text="Supply report")
 	reporter = models.ForeignKey(Reporter, help_text="Field monitor")
 	supply_location = models.ForeignKey(SupplyLocation, help_text="Reporting location")
 	time = models.DateTimeField(auto_now_add=True)
-	beneficiaries = models.PositiveIntegerField(help_text="Number of benficiaries")
-	quantity = models.PositiveIntegerField(help_text="Quantity")
-	consumption = models.PositiveIntegerField(help_text="Consumption quantity")
-	otp_balance = models.PositiveIntegerField(help_text="Balance at OTP quantity")
-	woreda_balance = models.PositiveIntegerField(help_text="Balance at woreda quantity")
+	beneficiaries = models.PositiveIntegerField(blank=True, null=True, help_text="Number of benficiaries")
+	quantity = models.PositiveIntegerField(blank=True, null=True, help_text="Quantity")
+	consumption = models.PositiveIntegerField(blank=True, null=True, help_text="Consumption quantity")
+	balance = models.PositiveIntegerField(blank=True, null=True, help_text="Balance at OTP quantity")
 
 	def __unicode__(self):
 		return "%s on %s" %\
-		(self.supply_location, self.time)
+		(self.supply_location, self.time.strftime("%d/%m/%y"))
 	
 	class Meta:
 		verbose_name_plural="Entries"
+
