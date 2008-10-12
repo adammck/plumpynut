@@ -34,7 +34,7 @@ class Location(models.Model):
 class SupplyLocation(models.Model):
 	supply = models.ForeignKey(Supply)
 	location = models.ForeignKey(Location)
-	quantity = models.IntegerField()
+	quantity = models.PositiveIntegerField()
 	
 	def __unicode__(self):
 		return "%s at %s" %\
@@ -53,3 +53,26 @@ class Notification(models.Model):
 		return "%s by %s" %\
 		(self.time, self.reporter)
 
+class Report(models.Model):
+	reporters = models.ManyToManyField(Reporter)
+	supply = models.ForeignKey(Supply)
+
+	def __unicode__(self):
+		return "%s report" % self.supply.name
+
+class Entry(models.Model):
+	reporter = models.ForeignKey(Reporter)
+	supply = models.ForeignKey(Supply)
+	location = models.ForeignKey(Location)
+	time = models.DateTimeField(auto_now_add=True)
+	beneficiaries = models.PositiveIntegerField()
+	quantity = models.PositiveIntegerField()
+	consumption = models.PositiveIntegerField()
+	balance = models.PositiveIntegerField()
+
+	def __unicode__(self):
+		return "%s report for %s on %s" %\
+		(self.supply.name, self.location, self.time)
+	
+	class Meta:
+		verbose_name_plural="Entries"
