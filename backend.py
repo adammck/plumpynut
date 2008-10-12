@@ -20,26 +20,32 @@ from webui.inventory.models import *
 class App(SmsApplication):
 	kw = SmsKeywords()
 	
-	def __get_reporter(self, **kwargs):
-		try:
-			r = Reporter.objects.get(**kwargs)
-			return r
+	def __get(self, model, **kwargs):
+		try: return model.objects.get(**kwargs)
+		except ObjectDoesNotExist: return None
+	
+	def __identify(self, caller, task=None):
+		rep = self.__get(Reporter, phone=caller)
 		
-		except ObjectDoesNotExist:
-			return None
+		# if the caller is not identified, then send
+		# them a message asking them to do so, and
+		# stop further processing
+		if not rep:
+			msg = "Please identify yourself"
+			if task: msg += " before %s" % (task)
+			raise CallerError(msg)
+		
+		return rep
 	
 	
 	# IDENTIFY <ALIAS>
 	@kw("identify (letters)", "this is (letters)", "i am (letters)")
 	def identify(self, caller, alias):
 
-		# attempt to find the reporter by his/her alias,
-		# and notify them that they were recognized
-		reporter = self.__get_reporter(alias=alias)
-		if not reporter:
-			self.send(caller, "Sorry, I don't know anyone called %s" % (alias))
-			self.log("Unknown alias: %s" % (alias), "warn")
-			return
+		# attempt to find the reporter by his/her alias
+		reporter = self.__get(Reporter, alias=alias)
+		if not reporter: raise CallerError(
+			"I don't know anyone called %s" % (alias))
 
 		# if this reported is already associated
 		# with this number, there's nothing to do
@@ -49,15 +55,17 @@ class App(SmsApplication):
 
 		# if anyone else is currently identified
 		# by this number, then disassociate them
-		prev = self.__get_reporter(phone=caller)
+		prev = self.__get(Reporter, phone=caller)
 		if prev and (prev.pk != reporter.pk):
 			prev.phone = ""
 			prev.save()
 
 		# associate the reporter with this number
-		self.send(caller, "Hello, %s" % (reporter))
 		reporter.phone = caller
 		reporter.save()
+		
+		# the reporter is now identified
+		self.send(caller, "Hello, %s" % (reporter))
 	
 	
 	# WHO <ALIAS>
@@ -66,7 +74,7 @@ class App(SmsApplication):
 		
 		# attempt to find a reporter by  alias
 		# and return their details to the caller
-		reporter = self.__get_reporter(alias=alias)
+		reporter = self.__get(Reporter, alias=alias)
 		if reporter: msg = "%s is %s" % (alias, reporter)
 		else:        msg = "I don't know anyone called %s" % (alias)
 		self.send(caller, msg)
@@ -78,7 +86,7 @@ class App(SmsApplication):
 
 		# attempt to find a reporter matching the
 		# caller's phone number, and remind them
-		reporter = self.__get_reporter(phone=caller)
+		reporter = self.__get(Reporter, phone=caller)
 		if reporter: msg = "You are %s" % (reporter)
 		else:        msg = "I don't know who you are"
 		self.send(caller, msg)
@@ -87,13 +95,38 @@ class App(SmsApplication):
 	# FLAG <NOTICE>
 	@kw("flag (.+)")
 	def flag(self, caller, notice):
-		try:
-			r = Reporter.objects.get(phone=caller)
-			n = Notification.objects.create(reporter=r, resolved="False", notice=notice)
-			self.send(caller, "Notice received")
+		r = self.__identify(caller, "flagging")
+		n = Notification.objects.create(reporter=r, resolved="False", notice=notice)
+		self.send(caller, "Notice received")
 
-		except ObjectAssertionError:
-			self.send(caller, "Error: Please identify yourself before flagging")
+
+
+
+	# <SUPPLY> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> <WOREDA-BALANCE>
+	# pn gdo 7 20
+	@kw("(letters) (letters) (numbers) (numbers)")
+	def report(self, caller, sup_code, loc_code, benef, qty):
+		
+		# ensure that the caller is known
+		reporter = self.__identify(caller, "reporting")
+		
+		# validate + fetch the supply
+		sup = self.__get(Supply, code=sup_code)
+		if not sup: raise CallerError(
+			"Invalid supply code: %s" % (sup_code))
+		
+		# ...and the location
+		loc = self.__get(Location, code=loc_code)
+		if not loc: raise CallerError(
+			"Invalid location code: %s" % (loc_code))
+		
+		# fetch the supplylocation object, to update the current stock
+		# levels. if it doesn't already exist, just create it, because
+		# the administrators probably won't want to add every supply
+		# to every location...
+		sl = SupplyLocation.objects.get_or_create(supply=sup, location=loc)
+
+
 
 
 	# nothing matched
