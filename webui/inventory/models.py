@@ -11,8 +11,9 @@ class Reporter(models.Model):
 	email = models.EmailField(blank=True)
 
 	def __unicode__(self):
-		return "%s %s" %\
-		(self.first_name, self.last_name)
+		ph = self.phone or "unknown"
+		return "%s %s [%s]" %\
+			(self.first_name, self.last_name, ph)
 
 class Supply(models.Model):
 	name = models.CharField(max_length=100)
