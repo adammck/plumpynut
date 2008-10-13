@@ -21,7 +21,7 @@ class AreaAdmin(admin.ModelAdmin):
 
 class LocationAdmin(admin.ModelAdmin):
 	form = LocationForm
-	list_display = ('name', 'area', 'code')
+	list_display = ('name', 'code', 'area')
 
 class NotificationAdmin(admin.ModelAdmin):
 	list_display = ('reporter', 'time', 'resolved', 'notice')
