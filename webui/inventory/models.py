@@ -3,7 +3,7 @@
 
 from django.db import models
 
-class Reporter(models.Model):
+class Monitor(models.Model):
 	first_name = models.CharField(max_length=50)
 	last_name = models.CharField(max_length=50)
 	alias = models.CharField(max_length=16, unique=True, help_text="Abbreviated name, lowercase letters")
@@ -57,14 +57,14 @@ class SupplyLocation(models.Model):
 		verbose_name_plural="Supplies per Location"
 
 class Notification(models.Model):
-	reporter = models.ForeignKey(Reporter)
+	monitor = models.ForeignKey(Monitor)
 	time = models.DateTimeField(auto_now_add=True)
-	notice = models.CharField(max_length=160, help_text="Alert from reporter")
+	notice = models.CharField(max_length=160, help_text="Alert from monitor")
 	resolved = models.BooleanField(help_text="Has the alert been attended to?")
 	
 	def __unicode__(self):
 		return "%s by %s" %\
-		(self.time.strftime("%d/%m/%y"), self.reporter)
+		(self.time.strftime("%d/%m/%y"), self.monitor)
 
 class Report(models.Model):
 	supply = models.ForeignKey(Supply)
@@ -80,7 +80,7 @@ class Report(models.Model):
 	latest_entry = property(_get_latest_entry)
 
 class Entry(models.Model):
-	reporter = models.ForeignKey(Reporter, help_text="Field monitor")
+	monitor = models.ForeignKey(Monitor, help_text="Field monitor"
 	supply_location = models.ForeignKey(SupplyLocation, help_text="Reporting location")
 	time = models.DateTimeField(auto_now_add=True)
 	beneficiaries = models.PositiveIntegerField(blank=True, null=True, help_text="Number of benficiaries")

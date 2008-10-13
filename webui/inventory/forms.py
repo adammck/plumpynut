@@ -9,9 +9,9 @@ import re
 LOWERCASE_REGEX = re.compile("^[a-z]+$")
 
 
-class ReporterForm(forms.ModelForm):
+class MonitorForm(forms.ModelForm):
 	class Meta:
-		model = Reporter
+		model = Monitor
 
 	def clean_alias(self):
 		data = self.cleaned_data["alias"]

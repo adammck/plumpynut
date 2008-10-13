@@ -6,12 +6,12 @@ from models import *
 from forms import *
 
 
-class ReporterAdmin(admin.ModelAdmin):
-	form = ReporterForm
+class MonitorAdmin(admin.ModelAdmin):
+	form = MonitorForm
 	list_display = ('full_name', 'alias', 'phone', 'email')
 
 class EntryAdmin(admin.ModelAdmin):
-	list_display = ('supply_location', 'time', 'reporter')
+	list_display = ('supply_location', 'time', 'monitor')
 	list_filter = ['time']
 	date_hierarchy = 'time'
 	ordering = ['time']
@@ -24,7 +24,7 @@ class LocationAdmin(admin.ModelAdmin):
 	list_display = ('name', 'code', 'area')
 
 class NotificationAdmin(admin.ModelAdmin):
-	list_display = ('reporter', 'time', 'resolved', 'notice')
+	list_display = ('monitor', 'time', 'resolved', 'notice')
 	list_filter = ['resolved', 'time']
 	date_hierarchy = 'time'
 	ordering = ['resolved']
@@ -44,7 +44,7 @@ class SupplyLocationAdmin(admin.ModelAdmin):
 
 
 # add our models to the django admin
-admin.site.register(Reporter, ReporterAdmin)
+admin.site.register(Monitor, MonitorAdmin)
 admin.site.register(Supply, SupplyAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(Location, LocationAdmin)
