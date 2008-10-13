@@ -34,5 +34,5 @@ class SupplyForm(forms.ModelForm):
 		model = Supply
 	
 	def clean_code(self):
-		data = slef.cleaned_data["code"]
+		data = self.cleaned_data["code"]
 		return data.upper()
