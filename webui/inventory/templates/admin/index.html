@@ -1,55 +1,15 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+{% load grid %}
 
 {% block stylesheet %}/assets/css/dashboard.css{% endblock %}
 
 {% block bodyclass %}dashboard{% endblock %}
 
-{% block breadcrumbs %}{% endblock %}
-
 {% block content %}
 <div id="content-main">
-
 <div class="module events">
-	<table>
-		<caption>Current Events</caption>
-		<thead>
-			<tr>
-				<th scope="column">Area</th>
-				<th scope="column">OTP</th>
-				<th scope="column">Ben.</th>
-				<th scope="column">Qty.</th>
-				<th scope="column">Con.</th>
-				<th scope="column">Bal.</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>Adaba</td>
-				<th scope="row">Garadillo</td>
-				<td>7</td>
-				<td>20</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Adaba</td>
-				<th scope="row">Washa</td>
-				<td>5</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Adaba</td>
-				<th scope="row">Abamo</td>
-				<td>10</td>
-				<td>22</td>
-				<td></td>
-				<td></td>
-			</tr>
-		</tbody>
-	</table>
+	{% incl_grid %}
 </div>
 
 {% if app_list %}

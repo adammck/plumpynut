@@ -1,0 +1,26 @@
+<table>
+	<caption>Today's Entries</caption>
+	<thead>
+		<tr>
+			<th scope="column">Area</th>
+			<th scope="column">OTP</th>
+			<th scope="column">Ben.</th>
+			<th scope="column">Qty.</th>
+			<th scope="column">Con.</th>
+			<th scope="column">Bal.</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for entry in entries %}
+		<tr>
+			<td>{{ entry.supply_location.location.area.name }}</td>
+			<th scope="row">{{ entry.supply_location.location.name }}</td>
+			<td>{{ entry.beneficiaries }}</td>
+			<td>{{ entry.quantity }}</td>
+			<td>{{ entry.consumption }}</td>
+			<td>{{ entry.balance }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
