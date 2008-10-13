@@ -6,8 +6,8 @@ from django.db import models
 class Reporter(models.Model):
 	first_name = models.CharField(max_length=50)
 	last_name = models.CharField(max_length=50)
-	alias = models.CharField(max_length=16, unique=True)
-	phone = models.CharField(max_length=30, blank=True)
+	alias = models.CharField(max_length=16, unique=True, help_text="Abbreviated name, lowercase letters")
+	phone = models.CharField(max_length=30, blank=True, help_text="e.g., +251912555555")
 	email = models.EmailField(blank=True)
 
 	def __unicode__(self):
@@ -22,7 +22,7 @@ class Reporter(models.Model):
 
 class Supply(models.Model):
 	name = models.CharField(max_length=100)
-	code = models.CharField(max_length=4)
+	code = models.CharField(max_length=4, help_text="Under 4 letters, please")
 
 	def __unicode__(self):
 		return self.name
@@ -37,17 +37,17 @@ class Area(models.Model):
 		return self.name
 
 class Location(models.Model):
-	name = models.CharField(max_length=100)
-	code = models.CharField(max_length=4)
-	area = models.ForeignKey(Area)
+	name = models.CharField(max_length=100, help_text="Name of OTP")
+	code = models.CharField(max_length=4, help_text="Under 4 letters, please")
+	area = models.ForeignKey(Area, help_text="Name of woreda")
 	
 	def __unicode__(self):
 		return self.name
 
 class SupplyLocation(models.Model):
-	supply = models.ForeignKey(Supply)
-	location = models.ForeignKey(Location)
-	quantity = models.PositiveIntegerField(blank=True)
+	supply = models.ForeignKey(Supply) 
+	location = models.ForeignKey(Location, help_text="Name of OTP")
+	quantity = models.PositiveIntegerField(blank=True, help_text="Balance at OTP quantity")
 	
 	def __unicode__(self):
 		return "%s at %s" %\
@@ -59,8 +59,8 @@ class SupplyLocation(models.Model):
 class Notification(models.Model):
 	reporter = models.ForeignKey(Reporter)
 	time = models.DateTimeField(auto_now_add=True)
-	notice = models.CharField(max_length=160)
-	resolved = models.BooleanField()
+	notice = models.CharField(max_length=160, help_text="Alert from reporter")
+	resolved = models.BooleanField(help_text="Has the alert been attended to?")
 	
 	def __unicode__(self):
 		return "%s by %s" %\
