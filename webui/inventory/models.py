@@ -80,7 +80,7 @@ class Report(models.Model):
 	latest_entry = property(_get_latest_entry)
 
 class Entry(models.Model):
-	monitor = models.ForeignKey(Monitor, help_text="Field monitor"
+	monitor = models.ForeignKey(Monitor, help_text="Field monitor")
 	supply_location = models.ForeignKey(SupplyLocation, help_text="Reporting location")
 	time = models.DateTimeField(auto_now_add=True)
 	beneficiaries = models.PositiveIntegerField(blank=True, null=True, help_text="Number of benficiaries")
