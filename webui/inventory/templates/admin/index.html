@@ -1,9 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
 
-{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css{% endblock %}
-
-{% block coltype %}colMS{% endblock %}
+{% block stylesheet %}/assets/css/dashboard.css{% endblock %}
 
 {% block bodyclass %}dashboard{% endblock %}
 
@@ -11,13 +9,55 @@
 
 {% block content %}
 <div id="content-main">
-THIS IS THE FRONT PAGE!!1 :O
+
+<div class="module events">
+	<table>
+		<caption>Current Events</caption>
+		<thead>
+			<tr>
+				<th scope="column">Area</th>
+				<th scope="column">OTP</th>
+				<th scope="column">Ben.</th>
+				<th scope="column">Qty.</th>
+				<th scope="column">Con.</th>
+				<th scope="column">Bal.</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Adaba</td>
+				<th scope="row">Garadillo</td>
+				<td>7</td>
+				<td>20</td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>Adaba</td>
+				<th scope="row">Washa</td>
+				<td>5</td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>Adaba</td>
+				<th scope="row">Abamo</td>
+				<td>10</td>
+				<td>22</td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
 
 {% if app_list %}
     {% for app in app_list %}
-        <div class="module">
+        <div class="module models">
         <table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
         <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a></caption>
+        <tbody>
         {% for model in app.models %}
             <tr>
             {% if model.perms.change %}
@@ -39,6 +79,7 @@ THIS IS THE FRONT PAGE!!1 :O
             {% endif %}
             </tr>
         {% endfor %}
+        </tbody>
         </table>
         </div>
     {% endfor %}
@@ -48,22 +89,3 @@ THIS IS THE FRONT PAGE!!1 :O
 </div>
 {% endblock %}
 
-{% block sidebar %}
-<div id="content-related">
-    <div class="module" id="recent-actions-module">
-        <h2>{% trans 'Recent Actions' %}</h2>
-        <h3>{% trans 'My Actions' %}</h3>
-            {% load log %}
-            {% get_admin_log 10 as admin_log for_user user %}
-            {% if not admin_log %}
-            <p>{% trans 'None available' %}</p>
-            {% else %}
-            <ul class="actionlist">
-            {% for entry in admin_log %}
-            <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">{% if not entry.is_deletion %}<a href="{{ entry.get_admin_url }}">{% endif %}{{ entry.object_repr|escape }}{% if not entry.is_deletion %}</a>{% endif %}<br /><span class="mini quiet">{% filter capfirst %}{% trans entry.content_type.name %}{% endfilter %}</span></li>
-            {% endfor %}
-            </ul>
-            {% endif %}
-    </div>
-</div>
-{% endblock %}

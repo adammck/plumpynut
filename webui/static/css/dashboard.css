@@ -1,0 +1,13 @@
+/* Name and/or Title
+ * vim:set noet:
+ * --
+ * Two or three lines of purpose and/or
+ * justification for the existence of this */
+
+
+/* import the default django stylesheet first */
+@import url("/assets/admin/css/dashboard.css");
+
+.dashboard .module table th       { width: auto; }
+.dashboard .module table tbody th { width: 100%; }
+
