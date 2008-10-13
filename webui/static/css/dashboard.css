@@ -8,6 +8,18 @@
 /* import the default django stylesheet first */
 @import url("/assets/admin/css/dashboard.css");
 
+/* full width events! */
+.dashboard #content,
+.dashboard #content .events { width: auto; }
+.dashboard .module { width: 500px; }
+
+
+/* remove the default TH rule, which blows up our fancy
+ * events table, and replace it with a more specific rule */
 .dashboard .module table th       { width: auto; }
 .dashboard .module table tbody th { width: 100%; }
+
+/* space things out a bit more */
+.dashboard .events, .dashboard h1 {
+	margin-bottom: 10px; }
 
