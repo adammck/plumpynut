@@ -86,7 +86,7 @@ class SupplyLocation(models.Model):
 class Notification(models.Model):
 	monitor = models.ForeignKey(Monitor)
 	time = models.DateTimeField(auto_now_add=True)
-	notice = models.CharField(max_length=160, help_text="Alert from monitor")
+	notice = models.CharField(blank=True, max_length=160, help_text="Alert from monitor")
 	resolved = models.BooleanField(help_text="Has the alert been attended to?")
 	
 	def __unicode__(self):
