@@ -35,9 +35,21 @@ class Supply(models.Model):
 
 	number_of_reports = property(_get_number_of_reports)
 
+class Zone(models.Model):
+	name = models.CharField(max_length=100, help_text="Name of zone")
+
+	def __unicode__(self):
+		return self.name
+
+	def _get_number_of_areas(self):
+		return len(Area.objects.filter(zone=self.id))
+
+	number_of_areas = property(_get_number_of_areas)
+
 class Area(models.Model):
 	name = models.CharField(max_length=100, help_text="Name of woreda")
-	
+	zone = models.ForeignKey(Zone, help_text="Name of zone")
+
 	def __unicode__(self):
 		return self.name
 	

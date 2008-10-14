@@ -23,6 +23,9 @@ class LocationInline(admin.TabularInline):
 	form = LocationForm
 	model = Location
 
+class AreaInline(admin.TabularInline):
+	model = Area
+
 class AreaAdmin(admin.ModelAdmin):
 	list_display = ('name', 'number_of_locations')
 	inlines = [LocationInline,]
@@ -30,6 +33,9 @@ class AreaAdmin(admin.ModelAdmin):
 class LocationAdmin(admin.ModelAdmin):
 	form = LocationForm
 	list_display = ('name', 'code', 'area')
+
+class ZoneAdmin(admin.ModelAdmin):
+	inlines = [AreaInline, ]
 
 class NotificationAdmin(admin.ModelAdmin):
 	list_display = ('monitor', 'time', 'resolved', 'notice')
@@ -62,6 +68,7 @@ class SupplyLocationAdmin(admin.ModelAdmin):
 admin.site.register(Monitor, MonitorAdmin)
 admin.site.register(Supply, SupplyAdmin)
 admin.site.register(Area, AreaAdmin)
+admin.site.register(Zone, ZoneAdmin)
 #admin.site.register(Location, LocationAdmin)
 admin.site.register(SupplyLocation, SupplyLocationAdmin)
 admin.site.register(Notification, NotificationAdmin)
