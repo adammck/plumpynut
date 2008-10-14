@@ -10,6 +10,9 @@ class MonitorAdmin(admin.ModelAdmin):
 	form = MonitorForm
 	list_display = ('full_name', 'alias', 'phone', 'email')
 
+class EntryInline(admin.TabularInline):
+	model = Entry
+
 class EntryAdmin(admin.ModelAdmin):
 	list_display = ('supply_location', 'time', 'monitor')
 	list_filter = ['time']
@@ -21,6 +24,7 @@ class LocationInline(admin.TabularInline):
 	model = Location
 
 class AreaAdmin(admin.ModelAdmin):
+	list_display = ('name', 'number_of_locations')
 	inlines = [LocationInline,]
 
 class LocationAdmin(admin.ModelAdmin):
@@ -33,6 +37,11 @@ class NotificationAdmin(admin.ModelAdmin):
 	date_hierarchy = 'time'
 	ordering = ['resolved']
 
+class ReportInline(admin.TabularInline):
+	list_display = ('supply', 'begin_date', 'end_date', 'number_of_entries', 'latest_entry')
+	list_filter = ['begin_date']
+	model = Report
+
 class ReportAdmin(admin.ModelAdmin):
 	list_display = ('supply', 'begin_date', 'end_date', 'number_of_entries', 'latest_entry')
 	list_filter = ['begin_date']
@@ -40,11 +49,13 @@ class ReportAdmin(admin.ModelAdmin):
 
 class SupplyAdmin(admin.ModelAdmin):
 	form = SupplyForm
-	list_display = ('name', 'code')
+	list_display = ('name', 'code', 'number_of_reports')
+	inlines = [ReportInline,]
 
 class SupplyLocationAdmin(admin.ModelAdmin):
-	list_display = ('location', 'supply', 'quantity')
+	list_display = ('location', 'supply', 'quantity', 'area')
 	radio_fields = {'supply' : admin.HORIZONTAL}
+	inlines = [EntryInline,]
 
 
 # add our models to the django admin
