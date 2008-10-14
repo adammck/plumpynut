@@ -130,3 +130,16 @@ class Entry(models.Model):
 	class Meta:
 		verbose_name_plural="Entries"
 
+class Message(models.Model):
+	transaction = models.PositiveIntegerField(blank=True, null=True)
+	monitor = models.ForeignKey(Monitor, blank=True, null=True)
+	phone = models.CharField(max_length=30)
+	time = models.DateTimeField(auto_now_add=True)
+	message = models.CharField(max_length=160)
+	is_outgoing = models.BooleanField()
+	
+	def __unicode__(self):
+		if self.is_outgoing: dir = ">>"
+		else:                dir = "<<"
+		return "%s %s: %s" % (dir, self.monitor, self.message)
+

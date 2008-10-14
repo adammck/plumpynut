@@ -198,7 +198,33 @@ class App(SmsApplication):
 			(sup.name, loc.name, monitor, ", ".join(info)))
 
 
-
+	# always called by smsapp, to log
+	# without interfereing with dispatch
+	def before_incoming(self, caller, msg):
+		
+		# fetch the caller's identity, and log.	we must
+		# log the phone number as well as the monitor
+		# object, because they can (and will) change
+		rep = self.__get(Monitor, phone=caller)
+		Message.objects.create(
+			transaction=self.transaction,
+			is_outgoing=False,
+			monitor=rep,
+			phone=caller,
+			message=msg)
+	
+	
+	# as above...
+	def before_outgoing(self, recipient, msg):
+		rep = self.__get(Monitor, phone=recipient)
+		Message.objects.create(
+			transaction=self.transaction,
+			is_outgoing=True,
+			monitor=rep,
+			phone=recipient,
+			message=msg)
+	
+	
 	# nothing matched
 	def incoming_sms(self, caller, msg):
 		self.send(caller, "Oops. I didn't recognize '%s'. Please reply 'help' for more information."%\

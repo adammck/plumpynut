@@ -8,11 +8,32 @@
 /* import the default django stylesheet first */
 @import url("/assets/admin/css/dashboard.css");
 
-/* full width events! */
+/* make tables full width */
 .dashboard #content,
 .dashboard #content .events { width: auto; }
-.dashboard .module { width: 500px; }
+/*.dashboard .module { width: 50%; }*/
 
+/* make the sidebar considerably wider,
+   for the incomming/outgoing msg log */
+.dashboard #content-related {
+	margin-right: -39em;
+	width: 38em;
+}
+
+.dashboard .colMS {
+	margin-right: 40em !important; }
+
+
+/* ensure that the events and messages
+ * tables fill their container widths */
+.dashboard #content-related table,
+.dashboard .events table {
+	width: 100%; }
+
+/* allow the logs to wrap, since their
+ * contents are important and quite long */
+.dashboard #content-related td {
+	white-space: normal; }
 
 /* remove the default TH rule, which blows up our fancy
  * events table, and replace it with a more specific rule */

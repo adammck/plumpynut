@@ -1,0 +1,20 @@
+<table>
+	<caption>{{ caption }}</caption>
+	<thead>
+		<tr>
+			<th scope="column">Monitor</th>
+			<th scope="column">Phone</th>
+			<th scope="column">Message</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for m in messages %}
+		<tr class="trans-{{ m.transaction }}">
+			{% if m.monitor %}<td>{{ m.monitor.full_name }}{% else %}<td class="na">Unknown{% endif %}</td>
+			<td>{{ m.phone }}</td>
+			<td>{{ m.message }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
