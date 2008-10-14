@@ -94,9 +94,9 @@ class App(SmsApplication):
 
 	# FLAG <NOTICE>
 	@kw("flag", "flag (.+)")
-	def flag(self, caller, notice=None):
+	def flag(self, caller, notice=''):
 		monitor = self.__identify(caller, "flagging")
-		Notification.objects.create(monitor=monitor, resolved="False", notice=notice)
+		Notification.objects.create(monitor=monitor, resolved=0, notice=notice)
 		self.send(caller, "Notice received")
 
 	
@@ -118,7 +118,7 @@ class App(SmsApplication):
 
 	# HELP <QUERY> <CODE>
 	@kw("help", "help (letters)", "help (letters) (letters)")
-	def help(self, caller, query=None, code=None):
+	def help(self, caller, query='', code=''):
 		if(query):
 			if(query == "codes"):
 				supplies = Supply.objects.all()
@@ -142,7 +142,7 @@ class App(SmsApplication):
 	# <SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> 
 	# pn gdo 7 20
 	@kw("([a-z]{1,4}) ([a-z]{1,4})(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
-	def report(self, caller, sup_code, loc_code, ben=None, qty=None, con=None, bal=None):
+	def report(self, caller, sup_code, loc_code, ben='', qty='', con='', bal=''):
 		
 		# ensure that the caller is known
 		monitor = self.__identify(caller, "reporting")
