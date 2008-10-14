@@ -75,7 +75,7 @@ class App(SmsApplication):
 		# attempt to find a monitor by  alias
 		# and return their details to the caller
 		monitor = self.__get(Monitor, alias=alias)
-		if monitor: msg = "%s is %s" % (alias, reporter)
+		if monitor: msg = "%s is %s" % (alias, monitor)
 		else:        msg = "I don't know anyone called %s" % (alias)
 		self.send(caller, msg)
 
@@ -87,7 +87,7 @@ class App(SmsApplication):
 		# attempt to find a monitor matching the
 		# caller's phone number, and remind them
 		monitor = self.__get(Monitor, phone=caller)
-		if monitor: msg = "You are %s" % (reporter)
+		if monitor: msg = "You are %s" % (monitor)
 		else:        msg = "I don't know who you are"
 		self.send(caller, msg)
 
@@ -96,7 +96,7 @@ class App(SmsApplication):
 	@kw("flag", "flag (.+)")
 	def flag(self, caller, notice=None):
 		monitor = self.__identify(caller, "flagging")
-		Notification.objects.create(monitor=reporter, resolved="False", notice=notice)
+		Notification.objects.create(monitor=monitor, resolved="False", notice=notice)
 		self.send(caller, "Notice received")
 
 	
