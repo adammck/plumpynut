@@ -14,10 +14,14 @@ class EntryAdmin(admin.ModelAdmin):
 	list_display = ('supply_location', 'time', 'monitor')
 	list_filter = ['time']
 	date_hierarchy = 'time'
-	ordering = ['time']
+	ordering = ['time']	
+
+class LocationInline(admin.TabularInline):
+	form = LocationForm
+	model = Location
 
 class AreaAdmin(admin.ModelAdmin):
-	pass
+	inlines = [LocationInline,]
 
 class LocationAdmin(admin.ModelAdmin):
 	form = LocationForm
@@ -30,7 +34,7 @@ class NotificationAdmin(admin.ModelAdmin):
 	ordering = ['resolved']
 
 class ReportAdmin(admin.ModelAdmin):
-	list_display = ('supply', 'begin_date', 'end_date')
+	list_display = ('supply', 'begin_date', 'end_date', 'number_of_entries', 'latest_entry')
 	list_filter = ['begin_date']
 	radio_fields = {'supply' : admin.HORIZONTAL}
 
@@ -47,7 +51,7 @@ class SupplyLocationAdmin(admin.ModelAdmin):
 admin.site.register(Monitor, MonitorAdmin)
 admin.site.register(Supply, SupplyAdmin)
 admin.site.register(Area, AreaAdmin)
-admin.site.register(Location, LocationAdmin)
+#admin.site.register(Location, LocationAdmin)
 admin.site.register(SupplyLocation, SupplyLocationAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Report, ReportAdmin)
