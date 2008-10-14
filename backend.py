@@ -14,7 +14,7 @@ setup_environ(settings)
 # import the django models
 from webui.inventory.models import *
 
-
+from datetime import datetime
 
 
 class App(SmsApplication):
@@ -44,6 +44,9 @@ class App(SmsApplication):
 
 		# attempt to find the monitor by his/her alias
 		monitor = self.__get(Monitor, alias=alias)
+		# attempt to find the monitor by name
+		if not monitor: monitor = self.__get(Monitor, first_name=alias)
+		if not monitor: monitor = self.__get(Monitor, full_name=alias)
 		if not monitor: raise CallerError(
 			"I don't know anyone called %s" % (alias))
 
@@ -91,10 +94,21 @@ class App(SmsApplication):
 		else:        msg = "I don't know who you are"
 		self.send(caller, msg)
 
+	# CANCEL
+	@kw("cancel")
+	def cancel(self, caller):
+		monitor = self.__identify(caller, "cancelling")
+		entry = Entry.objects.get(monitor=monitor).order_by('-time')[0]
+		if ((entry.time - datetime.now()).seconds < 86399):
+			entry.delete()
+			self.send(caller, "%s's last entry has been deleted" % (monitor))
+		else:
+			self.send(caller, "It has been more than one day since %'s last entry. Please flag or contact an administer" % (monitor))
+
 
 	# FLAG <NOTICE>
 	@kw("flag", "flag (.+)")
-	def flag(self, caller, notice=''):
+	def flag(self, caller, notice=""):
 		monitor = self.__identify(caller, "flagging")
 		Notification.objects.create(monitor=monitor, resolved=0, notice=notice)
 		self.send(caller, "Notice received")
@@ -109,40 +123,38 @@ class App(SmsApplication):
 	
 	
 	# LOCATIONS
-	@kw("locations", "locs")
+	@kw("locations", "locs", "otp", "otps")
 	def locations(self, caller):
 		all_loc = Location.objects.all()
 		flat_loc = ["%s: %s" % (l.code, l.name) for l in all_loc]
 		self.send(caller, "\n".join(flat_loc))
 
 
-	# HELP <QUERY> <CODE>
+	# HELP <QUERY> 
 	@kw("help", "help (letters)", "help (letters) (letters)")
-	def help(self, caller, query='', code=''):
+	def help(self, caller, query=""):
 		if(query):
 			if(query == "codes"):
-				supplies = Supply.objects.all()
-				msg = ["%s: %s" % (s.name, s.code) for s in supplies]
-				self.send(caller,msg)
+				all_loc = Location.objects.all()
+				flat_loc = ["%s: %s" % (l.code, l.name) for l in all_loc]
+				self.send(caller, "\n".join(flat_loc))
 
 			if(query == "flags"):
 				msg = "Send 'flag' followed by a notice that will be reviewed by HQ. Please include your location, if applicable."
 				self.send(caller,msg)
 
-			if(code):
-				if(query == "format"):
-					if(code.upper() == "PN"):
-						msg = "<SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE>"
-						self.send(caller,msg)
+			if(query == "format"):
+				msg = "<SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE>"
+				self.send(caller,msg)
 		else:
-			msg = "UNICEF supply monitoring system help options: help codes, help format <code>, help flags"
+			msg = "UNICEF supply monitoring system help options: help codes, help format, help flags"
 			self.send(caller, msg)
 
 
 	# <SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> 
 	# pn gdo 7 20
 	@kw("([a-z]{1,4}) ([a-z]{1,4})(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
-	def report(self, caller, sup_code, loc_code, ben='', qty='', con='', bal=''):
+	def report(self, caller, sup_code, loc_code, ben="", qty="", con="", bal=""):
 		
 		# ensure that the caller is known
 		monitor = self.__identify(caller, "reporting")
