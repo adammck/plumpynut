@@ -189,7 +189,8 @@ class App(SmsApplication):
 
 	# nothing matched
 	def incoming_sms(self, caller, msg):
-		self.send(caller, "ERROR")
+		self.send(caller, "Oops. I didn't recognize '%s'. Please reply 'help' for more information."%\
+			msg)
 
 
 app = App(backend=kannel, sender_args=["user", "pass"])
