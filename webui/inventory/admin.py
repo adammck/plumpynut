@@ -35,6 +35,7 @@ class LocationAdmin(admin.ModelAdmin):
 	list_display = ('name', 'code', 'area')
 
 class ZoneAdmin(admin.ModelAdmin):
+	list_display = ('name', 'number_of_areas')
 	inlines = [AreaInline, ]
 
 class NotificationAdmin(admin.ModelAdmin):
