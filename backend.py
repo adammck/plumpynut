@@ -25,17 +25,17 @@ class App(SmsApplication):
 		except ObjectDoesNotExist: return None
 	
 	def __identify(self, caller, task=None):
-		rep = self.__get(Monitor, phone=caller)
+		monitor = self.__get(Monitor, phone=caller)
 		
 		# if the caller is not identified, then send
 		# them a message asking them to do so, and
 		# stop further processing
-		if not rep:
+		if not monitor:
 			msg = "Please identify yourself"
 			if task: msg += " before %s" % (task)
 			raise CallerError(msg)
 		
-		return rep
+		return monitor
 	
 	
 	# IDENTIFY <ALIAS>
@@ -47,7 +47,7 @@ class App(SmsApplication):
 		if not monitor: raise CallerError(
 			"I don't know anyone called %s" % (alias))
 
-		# if this reported is already associated
+		# if this monitor is already associated
 		# with this number, there's nothing to do
 		if monitor.phone == caller:
 			self.send(caller, "Hello again, %s" % (monitor))
@@ -94,9 +94,9 @@ class App(SmsApplication):
 
 	# FLAG <NOTICE>
 	@kw("flag", "flag (.+)")
-	def flag(self, caller, notice=None):
+	def flag(self, caller, notice=''):
 		monitor = self.__identify(caller, "flagging")
-		Notification.objects.create(monitor=monitor, resolved="False", notice=notice)
+		Notification.objects.create(monitor=monitor, resolved=0, notice=notice)
 		self.send(caller, "Notice received")
 
 	
@@ -118,7 +118,7 @@ class App(SmsApplication):
 
 	# HELP <QUERY> <CODE>
 	@kw("help", "help (letters)", "help (letters) (letters)")
-	def help(self, caller, query=None, code=None):
+	def help(self, caller, query='', code=''):
 		if(query):
 			if(query == "codes"):
 				supplies = Supply.objects.all()
@@ -142,10 +142,10 @@ class App(SmsApplication):
 	# <SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> 
 	# pn gdo 7 20
 	@kw("([a-z]{1,4}) ([a-z]{1,4})(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
-	def report(self, caller, sup_code, loc_code, ben=None, qty=None, con=None, bal=None):
+	def report(self, caller, sup_code, loc_code, ben='', qty='', con='', bal=''):
 		
 		# ensure that the caller is known
-		rep = self.__identify(caller, "reporting")
+		monitor = self.__identify(caller, "reporting")
 		
 		# validate + fetch the supply
 		sup = self.__get(Supply, code=sup_code.upper())
@@ -165,7 +165,7 @@ class App(SmsApplication):
 		# create the entry object, with
 		# no proper validation (todo!)
 		Entry.objects.create(
-			monitor=rep,
+			monitor=monitor,
 			supply_location=sl,
 			beneficiaries=ben,
 			quantity=qty,
@@ -183,7 +183,7 @@ class App(SmsApplication):
 		# notify the caller of their new entry
 		self.send(caller,
 			"Received %s report for %s by %s.\n%s\nIf this is not correct, reply with CANCEL" %\
-			(sup.name, loc.name, rep, ", ".join(info)))
+			(sup.name, loc.name, monitor, ", ".join(info)))
 
 
 	# always called by smsapp, to log
