@@ -25,7 +25,7 @@ class App(SmsApplication):
 		except ObjectDoesNotExist: return None
 	
 	def __identify(self, caller, task=None):
-		rep = self.__get(Reporter, phone=caller)
+		rep = self.__get(Monitor, phone=caller)
 		
 		# if the caller is not identified, then send
 		# them a message asking them to do so, and
@@ -42,40 +42,40 @@ class App(SmsApplication):
 	@kw("identify (letters)", "this is (letters)", "i am (letters)")
 	def identify(self, caller, alias):
 
-		# attempt to find the reporter by his/her alias
-		reporter = self.__get(Reporter, alias=alias)
-		if not reporter: raise CallerError(
+		# attempt to find the monitor by his/her alias
+		monitor = self.__get(Monitor, alias=alias)
+		if not monitor: raise CallerError(
 			"I don't know anyone called %s" % (alias))
 
 		# if this reported is already associated
 		# with this number, there's nothing to do
-		if reporter.phone == caller:
-			self.send(caller, "Hello again, %s" % (reporter))
+		if monitor.phone == caller:
+			self.send(caller, "Hello again, %s" % (monitor))
 			return
 
 		# if anyone else is currently identified
 		# by this number, then disassociate them
-		prev = self.__get(Reporter, phone=caller)
-		if prev and (prev.pk != reporter.pk):
+		prev = self.__get(Monitor, phone=caller)
+		if prev and (prev.pk != monitor.pk):
 			prev.phone = ""
 			prev.save()
 
-		# associate the reporter with this number
-		reporter.phone = caller
-		reporter.save()
+		# associate the monitor with this number
+		monitor.phone = caller
+		monitor.save()
 		
-		# the reporter is now identified
-		self.send(caller, "Hello, %s" % (reporter))
+		# the monitor is now identified
+		self.send(caller, "Hello, %s" % (monitor))
 	
 	
 	# WHO <ALIAS>
 	@kw("who is (letters)", "who (letters)", "(letters)\?")
 	def who(self, caller, alias):
 		
-		# attempt to find a reporter by  alias
+		# attempt to find a monitor by  alias
 		# and return their details to the caller
-		reporter = self.__get(Reporter, alias=alias)
-		if reporter: msg = "%s is %s" % (alias, reporter)
+		monitor = self.__get(Monitor, alias=alias)
+		if monitor: msg = "%s is %s" % (alias, reporter)
 		else:        msg = "I don't know anyone called %s" % (alias)
 		self.send(caller, msg)
 
@@ -84,10 +84,10 @@ class App(SmsApplication):
 	@kw("who am i", "whoami")
 	def whoami(self, caller):
 
-		# attempt to find a reporter matching the
+		# attempt to find a monitor matching the
 		# caller's phone number, and remind them
-		reporter = self.__get(Reporter, phone=caller)
-		if reporter: msg = "You are %s" % (reporter)
+		monitor = self.__get(Monitor, phone=caller)
+		if monitor: msg = "You are %s" % (reporter)
 		else:        msg = "I don't know who you are"
 		self.send(caller, msg)
 
@@ -95,8 +95,8 @@ class App(SmsApplication):
 	# FLAG <NOTICE>
 	@kw("flag", "flag (.+)")
 	def flag(self, caller, notice=None):
-		reporter = self.__identify(caller, "flagging")
-		Notification.objects.create(reporter=reporter, resolved="False", notice=notice)
+		monitor = self.__identify(caller, "flagging")
+		Notification.objects.create(monitor=reporter, resolved="False", notice=notice)
 		self.send(caller, "Notice received")
 
 	
@@ -165,7 +165,7 @@ class App(SmsApplication):
 		# create the entry object, with
 		# no proper validation (todo!)
 		Entry.objects.create(
-			reporter=rep,
+			monitor=rep,
 			supply_location=sl,
 			beneficiaries=ben,
 			quantity=qty,
