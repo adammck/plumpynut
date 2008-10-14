@@ -68,8 +68,8 @@ class Notification(models.Model):
 
 class Report(models.Model):
 	supply = models.ForeignKey(Supply)
-	begin_date = models.DateField(auto_now_add=True)
-	end_date = models.DateField(auto_now=True)
+	begin_date = models.DateField()
+	end_date = models.DateField()
 
 	def __unicode__(self):
 		return "%s report" % self.supply.name
