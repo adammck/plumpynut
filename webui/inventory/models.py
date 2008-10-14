@@ -30,11 +30,33 @@ class Supply(models.Model):
 	class Meta:
 		verbose_name_plural="Supplies"
 
-class Area(models.Model):
-	name = models.CharField(max_length=100)
-	
+	def _get_number_of_reports(self):
+		return len(Report.objects.filter(supply=self.id))
+
+	number_of_reports = property(_get_number_of_reports)
+
+class Zone(models.Model):
+	name = models.CharField(max_length=100, help_text="Name of zone")
+
 	def __unicode__(self):
 		return self.name
+
+	def _get_number_of_areas(self):
+		return len(Area.objects.filter(zone=self.id))
+
+	number_of_areas = property(_get_number_of_areas)
+
+class Area(models.Model):
+	name = models.CharField(max_length=100, help_text="Name of woreda")
+	zone = models.ForeignKey(Zone, help_text="Name of zone")
+
+	def __unicode__(self):
+		return self.name
+	
+	def _get_number_of_locations(self):
+		return len(Location.objects.filter(area=self.id))
+	
+	number_of_locations = property(_get_number_of_locations)
 
 class Location(models.Model):
 	name = models.CharField(max_length=100, help_text="Name of OTP")
@@ -56,6 +78,11 @@ class SupplyLocation(models.Model):
 	class Meta:
 		verbose_name_plural="Supplies per Location"
 
+	def _get_area(self):
+		return self.location.area
+
+	area = property(_get_area)
+
 class Notification(models.Model):
 	monitor = models.ForeignKey(Monitor)
 	time = models.DateTimeField(auto_now_add=True)
@@ -68,15 +95,23 @@ class Notification(models.Model):
 
 class Report(models.Model):
 	supply = models.ForeignKey(Supply)
-	begin_date = models.DateField(auto_now_add=True)
-	end_date = models.DateField(auto_now=True)
+	begin_date = models.DateField()
+	end_date = models.DateField()
 
 	def __unicode__(self):
 		return "%s report" % self.supply.name
 	
 	def _get_latest_entry(self):
-		return Entry.objects.order_by('-time')[0]
+		try:
+			e = Entry.objects.order_by('-time')[0]
+		except:
+			e = "No Entries"
+		return e
+	
+	def _get_number_of_entries(self):
+		return len(Entry.objects.filter(time__gte=self.begin_date).exclude(time__gte=self.end_date))
 
+	number_of_entries = property(_get_number_of_entries)
 	latest_entry = property(_get_latest_entry)
 
 class Entry(models.Model):
