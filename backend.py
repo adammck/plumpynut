@@ -94,16 +94,24 @@ class App(SmsApplication):
 		else:        msg = "I don't know who you are"
 		self.send(caller, msg)
 
+
 	# CANCEL
 	@kw("cancel")
 	def cancel(self, caller):
 		monitor = self.__identify(caller, "cancelling")
-		entry = Entry.objects.get(monitor=monitor).order_by('-time')[0]
-		if ((entry.time - datetime.now()).seconds < 86399):
-			entry.delete()
-			self.send(caller, "%s's last entry has been deleted" % (monitor))
-		else:
-			self.send(caller, "It has been more than one day since %'s last entry. Please flag or contact an administer" % (monitor))
+		# attempt to find monitor's most recent entry
+		try:
+			entry = Entry.objects.filter(monitor=monitor).order_by('-time')[0]
+			# delete the entry if it is younger than one day
+			if ((entry.time - datetime.now()).seconds < 86399):
+				entry.delete()
+				self.send(caller, "%s's last entry has been deleted" % (monitor))
+			# otherwise dispense bad news
+			else:
+				self.send(caller, "% has not submitted an entry today. Please flag or contact an administer" % (monitor))
+
+		except ObjectDoesNotExist:
+			self.send(caller, "%s has no entries to delete" % (monitor))
 
 
 	# FLAG <NOTICE>
