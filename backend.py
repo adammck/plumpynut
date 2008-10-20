@@ -108,18 +108,18 @@ class App(SmsApplication):
 				self.send(caller, "%s's last entry has been deleted" % (monitor))
 			# otherwise dispense bad news
 			else:
-				self.send(caller, "% has not submitted an entry today. Please flag or contact an administer" % (monitor))
+				self.send(caller, "% has not submitted an entry today. Please alert or contact an administer" % (monitor))
 
 		except ObjectDoesNotExist:
 			self.send(caller, "%s has no entries to delete" % (monitor))
 
 
-	# FLAG <NOTICE>
-	@kw("flag", "flag (.+)")
-	def flag(self, caller, notice=""):
-		monitor = self.__identify(caller, "flagging")
+	# ALERT <NOTICE>
+	@kw("alert", "alert(.+)")
+	def alert(self, caller, notice=""):
+		monitor = self.__identify(caller, "alerting")
 		Notification.objects.create(monitor=monitor, resolved=0, notice=notice)
-		self.send(caller, "Notice received")
+		self.send(caller, "Alert received")
 
 	
 	# SUPPLIES
@@ -147,15 +147,15 @@ class App(SmsApplication):
 				flat_loc = ["%s: %s" % (l.code, l.name) for l in all_loc]
 				self.send(caller, "\n".join(flat_loc))
 
-			if(query == "flags"):
-				msg = "Send 'flag' followed by a notice that will be reviewed by HQ. Please include your location, if applicable."
+			if(query == "alert"):
+				msg = "Send 'alert' followed by a notice that will be reviewed by HQ. Please include your location, if applicable."
 				self.send(caller,msg)
 
 			if(query == "format"):
 				msg = "<SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE>"
 				self.send(caller,msg)
 		else:
-			msg = "UNICEF supply monitoring system help options: help codes, help format, help flags"
+			msg = "UNICEF supply monitoring system help options: help codes, help format, help alert"
 			self.send(caller, msg)
 
 
