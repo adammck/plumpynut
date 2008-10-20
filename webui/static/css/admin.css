@@ -1,0 +1,69 @@
+/* Global Admin Stylesheet
+ * vim:set noet:
+ * --
+ * This overrides a lot of the Django admin
+ * styles, to make it look more like a UNICEF app */
+
+body {
+	background: #eee;
+}
+
+#container {
+	width: 80em;
+	margin: 0 auto;
+	background: #fff;
+}
+
+/* steal header bg from unicef.org */
+#header {
+	background: url("../gif/header.gif") repeat-x;
+	padding-top: 23px;
+	padding-bottom: 33px;
+}
+	
+	/* align in the middle of the
+	 * unicef blue stripe of header bg,
+	 * and display logo on the right */
+	#branding h1 {
+		background: url("../gif/unicef.gif") no-repeat 100% 50%;
+		line-height: 65px;
+		color: #fff;
+		margin: 0;
+	}
+
+	/* align with dark stripe
+	 * of header bg */	
+	#user-tools {
+		padding: 0;
+		top: 89px;
+		right: 10px;
+		line-height: 33px;
+	}
+
+
+#content {
+	margin: 15px;
+}
+
+	#content h1 {
+		color: #007bd6;
+		margin-bottom: 15px;
+	}
+
+	#content .module {
+		border: none;
+		margin-bottom: 15px;
+	}
+
+	#content .module h2,
+	#content .module caption,
+	#content .inline-group h2 {
+		background: #7eccff url("../png/h2.png") repeat-x;
+	}
+
+
+/* the footer doesn't seem to be in
+ * use, so hide it for the time being */
+#footer {
+	display: none; }
+
