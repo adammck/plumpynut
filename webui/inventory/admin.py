@@ -9,6 +9,7 @@ from forms import *
 class MonitorAdmin(admin.ModelAdmin):
 	form = MonitorForm
 	list_display = ('__unicode__', 'alias', 'phone', 'email')
+	search_fields = ('__unicode__', 'alias')
 
 class EntryInline(admin.TabularInline):
 	model = Entry
@@ -18,6 +19,7 @@ class EntryAdmin(admin.ModelAdmin):
 	list_filter = ['time']
 	date_hierarchy = 'time'
 	ordering = ['time']	
+	search_fields = ('supply_location', 'monitor')
 
 class LocationInline(admin.TabularInline):
 	form = LocationForm
@@ -28,17 +30,20 @@ class AreaInline(admin.TabularInline):
 
 class AreaAdmin(admin.ModelAdmin):
 	list_display = ('name', 'code', 'zone', 'number_of_OTPs')
+	search_fields = ('name', 'code', 'zone')
 	inlines = [LocationInline,]
 
 class LocationAdmin(admin.ModelAdmin):
 	form = LocationForm
 	verbose_name = "OTP"
 	list_display = ('name', 'code', 'woreda')
+	search_fields = ('name', 'code', 'woreda')
 
 class ZoneAdmin(admin.ModelAdmin):
 	list_display = ('name', 'region', 'number_of_woredas')
 	radio_fields = {'region' : admin.HORIZONTAL}
 	inlines = [AreaInline, ]
+	search_fields = ('name', 'region')
 
 class RegionAdmin(admin.ModelAdmin):
 	list_display = ('name', 'number_of_zones')
