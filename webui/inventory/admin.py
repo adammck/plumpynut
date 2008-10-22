@@ -8,7 +8,7 @@ from forms import *
 
 class MonitorAdmin(admin.ModelAdmin):
 	form = MonitorForm
-	list_display = ('full_name', 'alias', 'phone', 'email')
+	list_display = ('__unicode__', 'alias', 'phone', 'email')
 
 class EntryInline(admin.TabularInline):
 	model = Entry
@@ -32,6 +32,7 @@ class AreaAdmin(admin.ModelAdmin):
 
 class LocationAdmin(admin.ModelAdmin):
 	form = LocationForm
+	verbose_name = "OTP Camp"
 	list_display = ('name', 'code', 'area')
 
 class ZoneAdmin(admin.ModelAdmin):
@@ -50,9 +51,12 @@ class ReportInline(admin.TabularInline):
 	model = Report
 
 class ReportAdmin(admin.ModelAdmin):
-	list_display = ('supply', 'begin_date', 'end_date', 'number_of_entries', 'latest_entry')
+	list_display = ('supply', 'begin_date', 'end_date', 'number_of_entries', 'latest_entry', 'export_link')
 	list_filter = ['begin_date']
 	radio_fields = {'supply' : admin.HORIZONTAL}
+
+	def export_link(self, instance):
+		return "/export/%d/"
 
 class SupplyAdmin(admin.ModelAdmin):
 	form = SupplyForm
@@ -70,8 +74,9 @@ admin.site.register(Monitor, MonitorAdmin)
 admin.site.register(Supply, SupplyAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(Zone, ZoneAdmin)
-#admin.site.register(Location, LocationAdmin)
-admin.site.register(SupplyLocation, SupplyLocationAdmin)
+admin.site.register(Location, LocationAdmin)
+#admin.site.register(SupplyLocation, SupplyLocationAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Report, ReportAdmin)
 admin.site.register(Entry, EntryAdmin)
+

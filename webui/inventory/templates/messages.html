@@ -10,7 +10,7 @@
 	<tbody>
 	{% for m in messages %}
 		<tr class="trans-{{ m.transaction }}">
-			{% if m.monitor %}<td>{{ m.monitor.full_name }}{% else %}<td class="na">Unknown{% endif %}</td>
+			{% if m.monitor %}<td>{{ m.monitor }}{% else %}<td class="na">Unknown{% endif %}</td>
 			<td>{{ m.phone }}</td>
 			<td>{{ m.message }}</td>
 		</tr>

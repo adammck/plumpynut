@@ -13,6 +13,7 @@
 .dashboard #content .events { width: auto; }
 /*.dashboard .module { width: 50%; }*/
 
+
 /* make the sidebar considerably wider,
    for the incomming/outgoing msg log */
 .dashboard #content-related {
@@ -28,17 +29,27 @@
  * tables fill their container widths */
 .dashboard #content-related table,
 .dashboard .events table {
-	width: 100%; }
+	width: 100%;
+	color: #444;
+}
 
 /* allow the logs to wrap, since their
  * contents are important and quite long */
 .dashboard #content-related td {
-	white-space: normal; }
+	white-space: normal;
+	font-size: 10px;
+}
 
 /* remove the default TH rule, which blows up our fancy
  * events table, and replace it with a more specific rule */
 .dashboard .module table th       { width: auto; }
 .dashboard .module table tbody th { width: 100%; }
+
+/* some column headers have
+ * extra help in tooltips */
+.dashboard table th.tip {
+	cursor: help;
+}
 
 /* space things out a bit more */
 .dashboard .events, .dashboard h1 {

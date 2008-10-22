@@ -24,7 +24,7 @@ class MonitorForm(forms.ModelForm):
 class LocationForm(forms.ModelForm):
 	class Meta:
 		model = Location
-
+		
 	def clean_code(self):
 		data = self.cleaned_data["code"]
 		return data.upper()

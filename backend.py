@@ -22,7 +22,8 @@ class App(SmsApplication):
 	
 	def __get(self, model, **kwargs):
 		try: return model.objects.get(**kwargs)
-		except ObjectDoesNotExist: return None
+		except ObjectDoesNotExist: return None # nothing found
+		except AssertionError: return None     # more than one found
 	
 	def __identify(self, caller, task=None):
 		monitor = self.__get(Monitor, phone=caller)
@@ -33,6 +34,7 @@ class App(SmsApplication):
 		if not monitor:
 			msg = "Please identify yourself"
 			if task: msg += " before %s" % (task)
+			msg += ", by replying: IDENTIFY <USERNAME>"
 			raise CallerError(msg)
 		
 		return monitor
@@ -44,9 +46,10 @@ class App(SmsApplication):
 
 		# attempt to find the monitor by his/her alias
 		monitor = self.__get(Monitor, alias=alias)
+		
 		# attempt to find the monitor by name
 		if not monitor: monitor = self.__get(Monitor, first_name=alias)
-		if not monitor: monitor = self.__get(Monitor, full_name=alias)
+		#if not monitor: monitor = self.__get(Monitor, full_name=alias)
 		if not monitor: raise CallerError(
 			"I don't know anyone called %s" % (alias))
 
@@ -71,6 +74,12 @@ class App(SmsApplication):
 		self.send(caller, "Hello, %s" % (monitor))
 	
 	
+	@kw("i love you")
+	def love(self, caller):
+		monitor = self.__identify(caller, "declaring your love")
+		self.send(caller, "I love you too, %s" % (monitor))
+	
+	
 	# WHO <ALIAS>
 	@kw("who is (letters)", "who (letters)", "(letters)\?")
 	def who(self, caller, alias):
@@ -78,7 +87,7 @@ class App(SmsApplication):
 		# attempt to find a monitor by  alias
 		# and return their details to the caller
 		monitor = self.__get(Monitor, alias=alias)
-		if monitor: msg = "%s is %s" % (alias, monitor)
+		if monitor: msg = "%s is %s" % (alias, monitor.details)
 		else:        msg = "I don't know anyone called %s" % (alias)
 		self.send(caller, msg)
 
@@ -90,7 +99,7 @@ class App(SmsApplication):
 		# attempt to find a monitor matching the
 		# caller's phone number, and remind them
 		monitor = self.__get(Monitor, phone=caller)
-		if monitor: msg = "You are %s" % (monitor)
+		if monitor: msg = "You are %s" % (monitor.details)
 		else:        msg = "I don't know who you are"
 		self.send(caller, msg)
 
@@ -115,8 +124,8 @@ class App(SmsApplication):
 
 
 	# ALERT <NOTICE>
-	@kw("alert", "alert(.+)")
-	def alert(self, caller, notice=""):
+	@kw("alert", "alert (.+)")
+	def alert(self, caller, notice):
 		monitor = self.__identify(caller, "alerting")
 		Notification.objects.create(monitor=monitor, resolved=0, notice=notice)
 		self.send(caller, "Alert received")
@@ -154,14 +163,15 @@ class App(SmsApplication):
 			if(query == "format"):
 				msg = "<SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE>"
 				self.send(caller,msg)
+				
 		else:
-			msg = "UNICEF supply monitoring system help options: help codes, help format, help alert"
+			msg = "uniSMS help options: help codes, help format, help alert"
 			self.send(caller, msg)
 
 
 	# <SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> 
 	# pn gdo 7 20
-	@kw("([a-z]{1,4}) ([a-z]{1,4})(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
+	@kw("([a-z]{1,4}) ([a-z]+)(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
 	def report(self, caller, sup_code, loc_code, ben="", qty="", con="", bal=""):
 		
 		# ensure that the caller is known
