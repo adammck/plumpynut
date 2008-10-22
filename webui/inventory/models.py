@@ -29,7 +29,7 @@ class Monitor(models.Model):
 
 class Supply(models.Model):
 	name = models.CharField(max_length=100)
-	code = models.CharField(max_length=4, help_text="Four letters or less")
+	code = models.CharField(max_length=20, help_text="Four letters or less")
 	
 	class Meta:
 		verbose_name_plural="Supplies"
@@ -42,8 +42,20 @@ class Supply(models.Model):
 
 	number_of_reports = property(_get_number_of_reports)
 
+class Region(models.Model):
+        name = models.CharField(max_length=100, help_text="Name of region")
+
+	def __unicode__(self):
+		return self.name
+
+	def _get_number_of_zones(self):
+		return len(Zone.objects.filter(region=self.id))
+
+	number_of_zones = property(_get_number_of_zones)
+
 class Zone(models.Model):
 	name = models.CharField(max_length=100, help_text="Name of zone")
+	region = models.ForeignKey(Region, help_text="Name of region")
 	
 	def __unicode__(self):
 		return self.name
@@ -51,10 +63,11 @@ class Zone(models.Model):
 	def _get_number_of_areas(self):
 		return len(Area.objects.filter(zone=self.id))
 
-	number_of_areas = property(_get_number_of_areas)
+	number_of_woredas = property(_get_number_of_areas)
 
 class Area(models.Model):
 	name = models.CharField(max_length=100, help_text="Full name of woreda")
+	code = models.CharField(max_length=20, help_text="Four letters or less")
 	zone = models.ForeignKey(Zone, help_text="Name of zone")
 
 	class Meta:
@@ -66,22 +79,27 @@ class Area(models.Model):
 	def _get_number_of_locations(self):
 		return len(Location.objects.filter(area=self.id))
 	
-	number_of_locations = property(_get_number_of_locations)
+	number_of_OTPs = property(_get_number_of_locations)
 
 class Location(models.Model):
-	name = models.CharField(max_length=100, help_text="Full name of the OTP camp")
-	code = models.CharField(max_length=4, help_text="Four letters or less")
+	name = models.CharField(max_length=100, help_text="Full name of the OTP")
+	code = models.CharField(max_length=20, help_text="Four letters or less")
 	area = models.ForeignKey(Area, help_text="Name of woreda")
 	
 	class Meta:
-		verbose_name = "OTP Camp"
+		verbose_name = "OTP"
 	
 	def __unicode__(self):
 		return self.name
 
+	def _get_woreda(self):
+    		return self.area
+
+	woreda = property(_get_woreda)
+
 class SupplyLocation(models.Model):
 	supply = models.ForeignKey(Supply) 
-	location = models.ForeignKey(Location, help_text="Name of OTP camp")
+	otp = models.ForeignKey(Location, help_text="Name of OTP")
 	quantity = models.PositiveIntegerField(blank=True, null=True, help_text="Balance at OTP")
 	
 	def __unicode__(self):
@@ -94,7 +112,7 @@ class SupplyLocation(models.Model):
 	def _get_area(self):
 		return self.location.area
 
-	area = property(_get_area)
+	woreda = property(_get_area)
 
 class Notification(models.Model):
 	monitor = models.ForeignKey(Monitor)
