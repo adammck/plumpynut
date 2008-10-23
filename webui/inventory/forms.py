@@ -21,13 +21,6 @@ class MonitorForm(forms.ModelForm):
 		
 		return data
 
-class LocationForm(forms.ModelForm):
-	class Meta:
-		model = Location
-		
-	def clean_code(self):
-		data = self.cleaned_data["code"]
-		return data.upper()
 	
 class SupplyForm(forms.ModelForm):
 	class Meta:

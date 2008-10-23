@@ -22,7 +22,6 @@ class EntryAdmin(admin.ModelAdmin):
 	search_fields = ('supply_location', 'monitor')
 
 class LocationInline(admin.TabularInline):
-	form = LocationForm
 	model = Location
 
 class AreaInline(admin.TabularInline):
@@ -34,7 +33,6 @@ class AreaAdmin(admin.ModelAdmin):
 	inlines = [LocationInline,]
 
 class LocationAdmin(admin.ModelAdmin):
-	form = LocationForm
 	verbose_name = "OTP"
 	list_display = ('name', 'code', 'woreda')
 	search_fields = ('name', 'code', 'woreda')
