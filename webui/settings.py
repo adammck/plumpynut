@@ -16,15 +16,14 @@ ADMINS = (
 	("Evan Wheeler", "ewheeler@unicef.org")
 )
 
+
 # database settings
 #DATABASE_NAME = root + "/dev.sqlite"
 #DATABASE_ENGINE = "sqlite3"
-DATABASE_ENGINE = 'mysql'
-DATABASE_NAME = 'plumpynut'
-DATABASE_USER = 'unicef'
-DATABASE_PASSWORD = 'm3p3m3p3'
-DATABASE_HOST = ''
-DATABASE_PORT = ''
+DATABASE_ENGINE   = "mysql"
+DATABASE_NAME     = "unisms"
+DATABASE_USER     = "unicef"
+DATABASE_PASSWORD = "mepemepe"
 
 
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -94,10 +93,4 @@ INSTALLED_APPS = (
     'webui.inventory',
     'webui.export'
 )
-
-AUTHENTICATION_BACKENDS = (
-	"inventory.auth_backends.CustomUserModelBackend",
-)
-
-CUSTOM_USER_MODEL = "accounts.CustomUser"
 
