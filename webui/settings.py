@@ -92,5 +92,12 @@ INSTALLED_APPS = (
     #'django.contrib.sites',
     'django.contrib.admin',
     'webui.inventory',
+    'webui.export'
 )
+
+AUTHENTICATION_BACKENDS = (
+	"inventory.auth_backends.CustomUserModelBackend",
+)
+
+CUSTOM_USER_MODEL = "accounts.CustomUser"
 

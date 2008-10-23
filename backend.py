@@ -1,29 +1,42 @@
 #!/usr/bin/env python
 # vim: noet
 
-from smsapp import *
 import kannel
+from smsapp import *
+from datetime import date, datetime
+from strings import ENGLISH as STR
 
 
 # import the essentials of django
 from django.core.management import setup_environ
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from webui import settings
 setup_environ(settings)
 
-# import the django models
+# import the django models, which should be movd
+# somewhere sensible at the earliest opportunity
 from webui.inventory.models import *
 
-from datetime import datetime
+
 
 
 class App(SmsApplication):
 	kw = SmsKeywords()
 	
+	# non-standard regex chunks
+	ALIAS = "([a-z\.]+)"
+	
+	
 	def __get(self, model, **kwargs):
-		try: return model.objects.get(**kwargs)
-		except ObjectDoesNotExist: return None # nothing found
-		except AssertionError: return None     # more than one found
+		try:
+			# attempt to fetch the object
+			return model.objects.get(**kwargs)
+		
+		# no objects or multiple objects found (in the latter case,
+		# something is probably broken, so perhaps we should warn)
+		except (ObjectDoesNotExist, MultipleObjectsReturned):
+			return None
+	
 	
 	def __identify(self, caller, task=None):
 		monitor = self.__get(Monitor, phone=caller)
@@ -34,30 +47,82 @@ class App(SmsApplication):
 		if not monitor:
 			msg = "Please identify yourself"
 			if task: msg += " before %s" % (task)
-			msg += ", by replying: IDENTIFY <USERNAME>"
+			msg += ", by replying: I AM <USERNAME>"
 			raise CallerError(msg)
 		
 		return monitor
 	
-	
-	# IDENTIFY <ALIAS>
-	@kw("identify (letters)", "this is (letters)", "i am (letters)")
-	def identify(self, caller, alias):
 
-		# attempt to find the monitor by his/her alias
-		monitor = self.__get(Monitor, alias=alias)
+	def __monitor(self, alias):
 		
-		# attempt to find the monitor by name
-		if not monitor: monitor = self.__get(Monitor, first_name=alias)
-		#if not monitor: monitor = self.__get(Monitor, full_name=alias)
-		if not monitor: raise CallerError(
-			"I don't know anyone called %s" % (alias))
-
+		# some people like to include dots
+		# in the username (like "a.mckaig"),
+		# so we'll merrily ignore those
+		clean = alias.replace(".", "")
+		
+		# attempt to fetch the monitor from db
+		# (for now, only by their ALIAS...
+		monitor = self.__get(Monitor, alias=clean)
+		
+		# abort if nothing was found
+		if not monitor:
+			raise CallerError(
+				STR["unknown_alias"] % alias)
+		
+		return monitor
+	
+	
+	def __guess(self, string, within):
+		try:
+			from Levenshtein import distance
+			import operator
+			d = []
+		
+		# something went wrong (probably
+		# missing the Levenshtein library)
+		except: return None
+		
+		# searches are case insensitive
+		string = string.upper()
+		
+		# calculate the levenshtein distance
+		# between each object and the argument
+		for obj in within:
+			
+			# some objects may have a variety of
+			# ways of being recognized (code or name)
+			if hasattr(obj, "guess"): tries = obj.guess()
+			else: tries = [str(obj)]
+			
+			# calculate the intersection of
+			# all objects and their "tries"
+			for t in tries:
+				dist = distance(str(t).upper(), string)
+				d.append((t, obj, dist))
+		
+		# sort it, and return the closest match
+		d.sort(None, operator.itemgetter(2))
+		if (len(d) > 0):# and (d[0][1] < 3):
+			return d[0]
+		
+		# nothing was close enough
+		else: return None
+		
+	
+	
+	
+	
+	# I AM <ALIAS> ------------------------------------------------------------
+	kw.prefix = ["i am", "this is", "identify"]
+	
+	@kw(ALIAS)
+	def identify(self, caller, alias):
+		monitor = self.__monitor(alias)
+		
 		# if this monitor is already associated
 		# with this number, there's nothing to do
 		if monitor.phone == caller:
-			self.send(caller, "Hello again, %s" % (monitor))
-			return
+			self.respond(STR["ident_again"] % (monitor))
 
 		# if anyone else is currently identified
 		# by this number, then disassociate them
@@ -71,121 +136,202 @@ class App(SmsApplication):
 		monitor.save()
 		
 		# the monitor is now identified
-		self.send(caller, "Hello, %s" % (monitor))
+		self.respond(STR["ident"] % (monitor))
 	
 	
-	@kw("i love you")
-	def love(self, caller):
-		monitor = self.__identify(caller, "declaring your love")
-		self.send(caller, "I love you too, %s" % (monitor))
-	
-	
-	# WHO <ALIAS>
-	@kw("who is (letters)", "who (letters)", "(letters)\?")
-	def who(self, caller, alias):
-		
-		# attempt to find a monitor by  alias
-		# and return their details to the caller
-		monitor = self.__get(Monitor, alias=alias)
-		if monitor: msg = "%s is %s" % (alias, monitor.details)
-		else:        msg = "I don't know anyone called %s" % (alias)
-		self.send(caller, msg)
+	@kw.blank()
+	@kw.invalid()
+	def identify_fail(self, caller, *msg):
+		raise CallerError(STR["ident_help"])
 
 
-	# WHO AM I
-	@kw("who am i", "whoami")
+
+
+	# WHO AM I ----------------------------------------------------------------
+	kw.prefix = ["who am i", "whoami"]
+
+	@kw.blank()
 	def whoami(self, caller):
 
 		# attempt to find a monitor matching the
 		# caller's phone number, and remind them
 		monitor = self.__get(Monitor, phone=caller)
-		if monitor: msg = "You are %s" % (monitor.details)
-		else:        msg = "I don't know who you are"
-		self.send(caller, msg)
+		if monitor: self.respond(STR["whoami"] % (monitor.details))
+		else: raise CallerError(STR["whoami_unknown"])
+	
+	@kw.invalid()
+	def whoami_help(self, caller, *msg):
+		raise CallerError(STR["whoami_help"])
+	
+	
+	
+	
+	# WHO IS <ALIAS> ----------------------------------------------------------
+	kw.prefix = ["who is", "whois"]
+	
+	@kw(ALIAS)
+	def who(self, caller, alias):
+		monitor = self.__monitor(alias)
+		self.respond(STR["whois"] % (alias, monitor.details))
+	
+	@kw.blank()
+	@kw.invalid()
+	def who_fail(self, caller, *msg):
+		raise CallerError(STR["whois_help"])
+	
+	
+	
+	
+	# ALERT <NOTICE> ----------------------------------------------------------
+	kw.prefix = "alert"
 
-
-	# CANCEL
-	@kw("cancel")
-	def cancel(self, caller):
-		monitor = self.__identify(caller, "cancelling")
-		# attempt to find monitor's most recent entry
-		try:
-			entry = Entry.objects.filter(monitor=monitor).order_by('-time')[0]
-			# delete the entry if it is younger than one day
-			if ((entry.time - datetime.now()).seconds < 86399):
-				entry.delete()
-				self.send(caller, "%s's last entry has been deleted" % (monitor))
-			# otherwise dispense bad news
-			else:
-				self.send(caller, "% has not submitted an entry today. Please alert or contact an administer" % (monitor))
-
-		except ObjectDoesNotExist:
-			self.send(caller, "%s has no entries to delete" % (monitor))
-
-
-	# ALERT <NOTICE>
-	@kw("alert", "alert (.+)")
+	@kw("(whatever)")
 	def alert(self, caller, notice):
 		monitor = self.__identify(caller, "alerting")
 		Notification.objects.create(monitor=monitor, resolved=0, notice=notice)
-		self.send(caller, "Alert received")
+		self.respond(STR["alert_ok"])
+	
+	@kw.blank()
+	def alert_help(self, caller, *msg):
+		raise CallerError(STR["alert_help"])
+
+
+
+
+	# CANCEL ------------------------------------------------------------------
+	kw.prefix = "cancel"
+
+	@kw.blank()
+	def cancel(self, caller):
+		monitor = self.__identify(caller, "cancelling")
+		
+		try:
+			# attempt to find the monitor's
+			# most recent entry TODAY
+			latest = Entry.objects.filter(
+				time__gt=date.today(),
+				monitor=monitor)\
+				.order_by('-time')[0]
+			
+			# delete it and notify
+			entry.delete()
+			self.respond(STR["cancel_ok"])
+		
+		except (ObjectDoesNotExist, IndexError):
+			raise CallerError(STR["cancel_none"])
+	
+	@kw.invalid()
+	def cancel_help(self, caller, *msg):
+		raise CallerError(STR["cancel_help"])
 
 	
-	# SUPPLIES
-	@kw("supplies", "supplys", "sups")
+	
+	
+	# SUPPLIES ----------------------------------------------------------------
+	kw.prefix = ["supplies", "supplys", "supply", "sups"]
+	
+	@kw.blank()
 	def supplies(self, caller):
-		all_sup = Supply.objects.all()
-		flat_sup = ["%s: %s" % (s.code, s.name) for s in all_sup]
-		self.send(caller, "\n".join(flat_sup))
+		self.respond(["%s: %s" % (s.code, s.name)\
+			for s in Supply.objects.all()])
+	
+	@kw.invalid()
+	def supplies_help(self, caller):
+		raise CallerError(STR["supplies_help"])
 	
 	
-	# LOCATIONS
-	@kw("locations", "locs", "otp", "otps")
+	
+	
+	# LOCATIONS ---------------------------------------------------------------
+	kw.prefix = ["locations", "locs", "otp", "otps"]
+	
+	@kw.blank()
 	def locations(self, caller):
-		all_loc = Location.objects.all()
-		flat_loc = ["%s: %s" % (l.code, l.name) for l in all_loc]
-		self.send(caller, "\n".join(flat_loc))
+		self.respond(["%s: %s" % (l.code, l.name)\
+			for l in Location.objects.all()])
+	
+	@kw.invalid()
+	def locations_help(self, caller):
+		raise CallerError(STR["locations_help"])
+	
+	
+	
+	
+	# HELP <QUERY> ------------------------------------------------------------
+	kw.prefix = ["help", "help me"]
+	
+	@kw.blank()
+	def help_main(self, caller):
+		self.respond(STR["help_main"])
+	
+	@kw("report", "format", "fields")
+	def help_report(self, caller):
+		self.respond(STR["help_report"])
+	
+	@kw.invalid()
+	def help_help(self, caller):
+		self.respond(STR["help_help"])
 
-
-	# HELP <QUERY> 
-	@kw("help", "help (letters)", "help (letters) (letters)")
-	def help(self, caller, query=""):
-		if(query):
-			if(query == "codes"):
-				all_loc = Location.objects.all()
-				flat_loc = ["%s: %s" % (l.code, l.name) for l in all_loc]
-				self.send(caller, "\n".join(flat_loc))
-
-			if(query == "alert"):
-				msg = "Send 'alert' followed by a notice that will be reviewed by HQ. Please include your location, if applicable."
-				self.send(caller,msg)
-
-			if(query == "format"):
-				msg = "<SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE>"
-				self.send(caller,msg)
-				
-		else:
-			msg = "uniSMS help options: help codes, help format, help alert"
-			self.send(caller, msg)
-
-
-	# <SUPPLY-CODE> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION-QUANTITY> <OTP-BALANCE> 
-	# pn gdo 7 20
-	@kw("([a-z]{1,4}) ([a-z]+)(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
+	
+	
+	
+	# <SUPPLY> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
+	kw.prefix = ""
+	
+	@kw("(letters) (letters)(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
 	def report(self, caller, sup_code, loc_code, ben="", qty="", con="", bal=""):
 		
 		# ensure that the caller is known
 		monitor = self.__identify(caller, "reporting")
 		
+		
 		# validate + fetch the supply
-		sup = self.__get(Supply, code=sup_code.upper())
-		if not sup: raise CallerError(
-			"Invalid supply code: %s" % (sup_code))
+		scu = sup_code.upper()
+		sup = self.__get(Supply, code=scu)
+		if sup is None:
+			
+			# invalid supply code, so
+			# search for a close match
+			all_sup = Supply.objects.all()
+			sug = self.__guess(scu, all_sup)
+			if sug is not None:
+				str, obj, dist = sug
+			
+				# found a close match, so
+				# error with a suggestion
+				if dist < 5:
+					raise CallerError(STR["suggest"]\
+					% ("supply code", scu, obj.code, obj.name))
+			
+			# no close matches (or spellcheck isn't
+			# working), so just return error
+			raise CallerError(STR["unknown"]\
+			% ("supply code", scu))
+		
 		
 		# ...and the location
-		loc = self.__get(Location, code=loc_code.upper())
-		if not loc: raise CallerError(
-			"Invalid location code: %s" % (loc_code))
+		lcu = loc_code.upper()
+		loc = self.__get(Location, code=lcu)
+		if loc is None:
+		
+			# invalid location code, so
+			# search for a close match
+			all_loc = Location.objects.all()
+			sug = self.__guess(lcu, all_loc)
+			if sug is not None:
+				str, obj, dist = sug
+			
+				# found a close match, so
+				# error with a suggestion
+				if dist < 5:
+					raise CallerError(STR["suggest"]\
+					% ("location code", lcu, obj.code, obj.name))
+			
+			# no close matches (or spellcheck isn't
+			# working), so just return error
+			raise CallerError(STR["unknown"]\
+			% ("location code", lcu))
+		
 		
 		# fetch the supplylocation object, to update the current stock
 		# levels. if it doesn't already exist, just create it, because
@@ -211,11 +357,24 @@ class App(SmsApplication):
 			"bal=%s" % (bal or "??")]
 		
 		# notify the caller of their new entry
-		self.send(caller,
+		# this doesn't seem to be localizable
+		self.respond(
 			"Received %s report for %s by %s.\n%s\nIf this is not correct, reply with CANCEL" %\
 			(sup.name, loc.name, monitor, ", ".join(info)))
 
 
+	
+	
+	# NO IDEA WHAT THE CALLER WANTS -------------------------------------------
+	
+	def incoming_sms(self, caller, msg):
+		raise CallerError(STR["error"])
+
+
+
+
+	# LOGGING -----------------------------------------------------------------
+	
 	# always called by smsapp, to log
 	# without interfereing with dispatch
 	def before_incoming(self, caller, msg):
@@ -241,12 +400,6 @@ class App(SmsApplication):
 			monitor=rep,
 			phone=recipient,
 			message=msg)
-	
-	
-	# nothing matched
-	def incoming_sms(self, caller, msg):
-		self.send(caller, "Oops. I didn't recognize '%s'. Please reply 'help' for more information."%\
-			msg)
 
 
 app = App(backend=kannel, sender_args=["user", "pass"])

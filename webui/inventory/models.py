@@ -2,6 +2,7 @@
 # vim: noet
 
 from django.db import models
+from django.contrib.auth import models as auth_models
 from django.core.exceptions import ObjectDoesNotExist 
 from webui.utils import letter, otp_code, woreda_code 
 
@@ -39,6 +40,10 @@ class Supply(models.Model):
 	def __unicode__(self):
 		return self.name
 
+	
+	def guess(self):
+		return [self.name, self.code]
+	
 	def _get_number_of_reports(self):
 		return len(Report.objects.filter(supply=self.id))
 
