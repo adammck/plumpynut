@@ -10,6 +10,7 @@ from forms import *
 class MonitorAdmin(admin.ModelAdmin):
 	form = MonitorForm
 	list_display = ('__unicode__', 'alias', 'phone', 'email')
+	search_fields = ('__unicode__', 'alias')
 
 class EntryInline(admin.TabularInline):
 	model = Entry
@@ -19,26 +20,32 @@ class EntryAdmin(admin.ModelAdmin):
 	list_filter = ['time']
 	date_hierarchy = 'time'
 	ordering = ['time']	
+	search_fields = ('supply_location', 'monitor')
 
 class LocationInline(admin.TabularInline):
-	form = LocationForm
 	model = Location
 
 class AreaInline(admin.TabularInline):
 	model = Area
 
 class AreaAdmin(admin.ModelAdmin):
-	list_display = ('name', 'number_of_locations')
+	list_display = ('name', 'code', 'zone', 'number_of_OTPs')
+	search_fields = ('name', 'code', 'zone')
 	inlines = [LocationInline,]
 
 class LocationAdmin(admin.ModelAdmin):
-	form = LocationForm
-	verbose_name = "OTP Camp"
-	list_display = ('name', 'code', 'area')
+	verbose_name = "OTP"
+	list_display = ('name', 'code', 'woreda')
+	search_fields = ('name', 'code', 'woreda')
 
 class ZoneAdmin(admin.ModelAdmin):
-	list_display = ('name', 'number_of_areas')
+	list_display = ('name', 'region', 'number_of_woredas')
+	radio_fields = {'region' : admin.HORIZONTAL}
 	inlines = [AreaInline, ]
+	search_fields = ('name', 'region')
+
+class RegionAdmin(admin.ModelAdmin):
+	list_display = ('name', 'number_of_zones')
 
 class NotificationAdmin(admin.ModelAdmin):
 	list_display = ('monitor', 'time', 'resolved', 'notice')
@@ -65,7 +72,7 @@ class SupplyAdmin(admin.ModelAdmin):
 	inlines = [ReportInline,]
 
 class SupplyLocationAdmin(admin.ModelAdmin):
-	list_display = ('location', 'supply', 'quantity', 'area')
+	list_display = ('location', 'supply', 'quantity', 'woreda')
 	radio_fields = {'supply' : admin.HORIZONTAL}
 	inlines = [EntryInline,]
 
@@ -75,6 +82,7 @@ admin.site.register(Monitor, MonitorAdmin)
 admin.site.register(Supply, SupplyAdmin)
 admin.site.register(Area, AreaAdmin)
 admin.site.register(Zone, ZoneAdmin)
+admin.site.register(Region, RegionAdmin)
 admin.site.register(Location, LocationAdmin)
 #admin.site.register(SupplyLocation, SupplyLocationAdmin)
 admin.site.register(Notification, NotificationAdmin)
