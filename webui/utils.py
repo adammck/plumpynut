@@ -1,4 +1,6 @@
 import csv, sys
+from random import choice 
+from string import * 
 import httplib, socket, time
 from urllib import urlencode
 from django.core.exceptions import ObjectDoesNotExist
@@ -55,3 +57,38 @@ def export_monitors():
     json_serializer = serializers.get_serializer("json")()
     json_serializer.serialize(Monitor.objects.all(), ensure_ascii=False, stream=out)
     return
+
+def letter():
+    from random import choice 
+    from string import uppercase 
+    return choice(uppercase)
+
+def woreda_code():
+    from webui.inventory.models import Area
+    code = "W"
+    while(len(code) < 4):
+        code += letter()
+    
+    print code
+    try:
+        Area.objects.get(code=code)
+        print '*****'
+	return woreda_code()
+    except ObjectDoesNotExist:
+        return code
+
+def otp_code():
+    from webui.inventory.models import Location
+    code = ""
+    while(len(code) < 4):
+        l = letter()
+        if(l != "W"):
+            code += l
+
+    print code
+    try:
+        Location.objects.get(code=code)
+        print '*****'
+        return otp_code() 
+    except ObjectDoesNotExist:
+        return code
