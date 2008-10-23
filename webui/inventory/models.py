@@ -2,6 +2,8 @@
 # vim: noet
 
 from django.db import models
+from django.contrib.auth import models as auth_models
+
 
 class Monitor(models.Model):
 	first_name = models.CharField(max_length=50)
@@ -36,7 +38,10 @@ class Supply(models.Model):
 
 	def __unicode__(self):
 		return self.name
-
+	
+	def guess(self):
+		return [self.name, self.code]
+	
 	def _get_number_of_reports(self):
 		return len(Report.objects.filter(supply=self.id))
 
@@ -74,7 +79,7 @@ class Location(models.Model):
 	area = models.ForeignKey(Area, help_text="Name of woreda")
 	
 	class Meta:
-		verbose_name = "OTP Camp"
+		verbose_name = "OTP"
 	
 	def __unicode__(self):
 		return self.name
