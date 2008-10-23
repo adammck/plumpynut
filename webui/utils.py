@@ -10,7 +10,7 @@ setup_environ(settings)
 from webui.inventory.models import * 
 
 def import_places():
-    filename = file('Sheet2-Table1.csv')
+    filename = file('SNNPR-Table1.csv')
     csvee = filename.read().split('\n')
     reader = csv.DictReader(csvee, quoting = csv.QUOTE_ALL)
     places = []
@@ -48,4 +48,10 @@ def export_places():
     out = open("places.json", "w")
     json_serializer = serializers.get_serializer("json")()
     json_serializer.serialize(places, ensure_ascii=False, stream=out)
+    return
+
+def export_monitors():
+    out = open("peeps.json", "w")
+    json_serializer = serializers.get_serializer("json")()
+    json_serializer.serialize(Monitor.objects.all(), ensure_ascii=False, stream=out)
     return
