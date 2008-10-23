@@ -2,6 +2,8 @@
 # vim: noet
 
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist 
+from webui.utils import letter, otp_code, woreda_code 
 
 class Monitor(models.Model):
 	first_name = models.CharField(max_length=50)
@@ -67,8 +69,14 @@ class Zone(models.Model):
 
 class Area(models.Model):
 	name = models.CharField(max_length=100, help_text="Full name of woreda")
-	code = models.CharField(max_length=20, help_text="Four letters or less")
+	code = models.CharField(max_length=20, editable=False)
 	zone = models.ForeignKey(Zone, help_text="Name of zone")
+
+	def save(self):
+		if(self.code == ''):
+			c = woreda_code()
+			self.code = c
+			models.Model.save(self)
 
 	class Meta:
 		verbose_name = "Woreda"
@@ -83,9 +91,15 @@ class Area(models.Model):
 
 class Location(models.Model):
 	name = models.CharField(max_length=100, help_text="Full name of the OTP")
-	code = models.CharField(max_length=20, help_text="Four letters or less")
+	code = models.CharField(max_length=20, editable=False)
 	area = models.ForeignKey(Area, help_text="Name of woreda")
-	
+
+	def save(self):
+		if(self.code == ''):
+			c = otp_code()
+			self.code = c
+			models.Model.save(self)
+
 	class Meta:
 		verbose_name = "OTP"
 	
@@ -99,7 +113,7 @@ class Location(models.Model):
 
 class SupplyLocation(models.Model):
 	supply = models.ForeignKey(Supply) 
-	otp = models.ForeignKey(Location, help_text="Name of OTP")
+	location= models.ForeignKey(Location, help_text="Name of OTP")
 	quantity = models.PositiveIntegerField(blank=True, null=True, help_text="Balance at OTP")
 	
 	def __unicode__(self):
@@ -128,6 +142,7 @@ class Report(models.Model):
 	supply = models.ForeignKey(Supply)
 	begin_date = models.DateField()
 	end_date = models.DateField()
+	supply_locations = models.ForeignKey(SupplyLocation)
 
 	def __unicode__(self):
 		return "%s report" % self.supply.name
