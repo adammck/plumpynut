@@ -25,3 +25,9 @@ def incl_messages(type):
 		"messages": Message.objects.filter(is_outgoing=og).order_by("-time")[:10]
 	}
 
+@register.inclusion_tag("notifications.html")
+def incl_notifications():
+	return {
+		"caption": "Unresolved Notifications",
+		"notifications": Notification.objects.filter(resolved=False).order_by("-time")
+	}

@@ -33,23 +33,40 @@
 	color: #444;
 }
 
+/* shrink the text in the right column,
+ * because there's a whole lot of data */
+.dashboard #content-related td {
+	font-size: 10px; }
+	
 /* allow the logs to wrap, since their
  * contents are important and quite long */
-.dashboard #content-related td {
-	white-space: normal;
-	font-size: 10px;
-}
+.dashboard #content-related td.msg {
+	white-space: normal; }
+
+	.dashboard #content-related td.msg a {
+		color: #000; }
 
 /* remove the default TH rule, which blows up our fancy
  * events table, and replace it with a more specific rule */
 .dashboard .module table th       { width: auto; }
 .dashboard .module table tbody th { width: 100%; }
 
+/* shrink the monitor and phone
+ * columns as much as possible,
+ * to make space for the messages */
+.dashboard .module table td.monitor,
+.dashboard .module table td.phone {
+	width: 1%;
+}
+
+/* unimportant or unknown information */
+.dashboard .module table td.dull {
+	color: #888; }
+
 /* some column headers have
  * extra help in tooltips */
 .dashboard table th.tip {
-	cursor: help;
-}
+	cursor: help; }
 
 /* space things out a bit more */
 .dashboard .events, .dashboard h1 {

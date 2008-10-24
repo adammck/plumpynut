@@ -275,11 +275,11 @@ class App(SmsApplication):
 	
 	
 	
-	# <SUPPLY> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
+	# <SUPPLY> <PLACE> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
 	kw.prefix = ""
 	
 	@kw("(letters) (letters)(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
-	def report(self, caller, sup_code, loc_code, ben="", qty="", con="", bal=""):
+	def report(self, caller, sup_code, place_code, ben="", qty="", con="", bal=""):
 		
 		# ensure that the caller is known
 		monitor = self.__identify(caller, "reporting")
@@ -309,40 +309,54 @@ class App(SmsApplication):
 			% ("supply code", scu))
 		
 		
-		# ...and the location
-		lcu = loc_code.upper()
-		loc = self.__get(Location, code=lcu)
-		if loc is None:
+		# init variables to avoid
+		# pythonic complaints
+		loc = None
+		area = None
+		pcu = place_code.upper()
 		
-			# invalid location code, so
-			# search for a close match
-			all_loc = Location.objects.all()
-			sug = self.__guess(lcu, all_loc)
-			if sug is not None:
-				str, obj, dist = sug
+		
+		# ...and the "place", which could
+		# be either a location or area
+		loc = self.__get(Location, code=pcu)
+		if loc is None:
 			
-				# found a close match, so
-				# error with a suggestion
-				if dist < 5:
-					raise CallerError(STR["suggest"]\
-					% ("location code", lcu, obj.code, obj.name))
+			# not a valid location, so try area
+			area = self.__get(Area, code=pcu)
+			if area is None:
+				
+				# the code was neither a location
+				# no area, so search for a close match
+				sug = self.__guess(pcu,
+					list(Location.objects.all()) +
+					list(Area.objects.all()))
+				
+				if sug is not None:
+					str, obj, dist = sug
+				
+					# found a close match, so
+					# error with a suggestion
+					if dist < 5:
+						raise CallerError(STR["suggest"]\
+						% ("OTP or Woreda code", pcu, obj.code, obj.name))
 			
-			# no close matches (or spellcheck isn't
-			# working), so just return error
-			raise CallerError(STR["unknown"]\
-			% ("location code", lcu))
+				# no close matches (or spellcheck isn't
+				# working), so just return error
+				raise CallerError(STR["unknown"]\
+				% ("OTP or Woreda code", pcu))
 		
 		
 		# fetch the supplylocation object, to update the current stock
 		# levels. if it doesn't already exist, just create it, because
 		# the administrators probably won't want to add them all...
-		sl, created = SupplyLocation.objects.get_or_create(supply=sup, location=loc)
+		
+		sp, created = SupplyPlace.objects.get_or_create(supply=sup, location=loc, area=area)
 		
 		# create the entry object, with
 		# no proper validation (todo!)
 		Entry.objects.create(
 			monitor=monitor,
-			supply_location=sl,
+			supply_place=sp,
 			beneficiaries=ben,
 			quantity=qty,
 			consumption=con,
@@ -359,8 +373,8 @@ class App(SmsApplication):
 		# notify the caller of their new entry
 		# this doesn't seem to be localizable
 		self.respond(
-			"Received %s report for %s by %s.\n%s\nIf this is not correct, reply with CANCEL" %\
-			(sup.name, loc.name, monitor, ", ".join(info)))
+			"Received %s report for %s %s by %s: %s.\nIf this is not correct, reply with CANCEL" %\
+			(sup.name, sp.type, sp.place, monitor, ", ".join(info)))
 
 
 	

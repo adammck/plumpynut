@@ -12,18 +12,22 @@ class MonitorAdmin(admin.ModelAdmin):
 	list_display = ('__unicode__', 'alias', 'phone', 'email')
 	search_fields = ('__unicode__', 'alias')
 
+
 class EntryInline(admin.TabularInline):
 	model = Entry
 
+
 class EntryAdmin(admin.ModelAdmin):
-	list_display = ('supply_location', 'time', 'monitor')
+	list_display = ('supply_place', 'time', 'monitor')
 	list_filter = ['time']
 	date_hierarchy = 'time'
 	ordering = ['time']	
-	search_fields = ('supply_location', 'monitor')
+	search_fields = ('supply_place', 'monitor')
+
 
 class LocationInline(admin.TabularInline):
 	model = Location
+
 
 class AreaInline(admin.TabularInline):
 	model = Area
@@ -41,8 +45,8 @@ class LocationAdmin(admin.ModelAdmin):
 class ZoneAdmin(admin.ModelAdmin):
 	list_display = ('name', 'region', 'number_of_woredas')
 	radio_fields = {'region' : admin.HORIZONTAL}
-	inlines = [AreaInline, ]
 	search_fields = ('name', 'region')
+	inlines = [AreaInline, ]
 
 class RegionAdmin(admin.ModelAdmin):
 	list_display = ('name', 'number_of_zones')
@@ -69,12 +73,12 @@ class ReportAdmin(admin.ModelAdmin):
 class SupplyAdmin(admin.ModelAdmin):
 	form = SupplyForm
 	list_display = ('name', 'code', 'number_of_reports')
-	inlines = [ReportInline,]
+	#inlines = [ReportInline,]
 
-class SupplyLocationAdmin(admin.ModelAdmin):
+class SupplyPlaceAdmin(admin.ModelAdmin):
 	list_display = ('location', 'supply', 'quantity', 'woreda')
 	radio_fields = {'supply' : admin.HORIZONTAL}
-	inlines = [EntryInline,]
+	#inlines = [EntryInline,]
 
 
 # add our models to the django admin
@@ -84,7 +88,7 @@ admin.site.register(Area, AreaAdmin)
 admin.site.register(Zone, ZoneAdmin)
 admin.site.register(Region, RegionAdmin)
 admin.site.register(Location, LocationAdmin)
-#admin.site.register(SupplyLocation, SupplyLocationAdmin)
+#admin.site.register(SupplyPlace, SupplyPlaceAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Report, ReportAdmin)
 admin.site.register(Entry, EntryAdmin)

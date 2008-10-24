@@ -2,16 +2,21 @@ from django import http
 from django.db import models
 from django.utils.text import capfirst
 
-
-def excel(request, app_label, model_name):
+def _get_model(app_label, model_name):
 	model = models.get_model(app_label, model_name)
-	rows = []
 	
 	# check that the model is valid
 	if model is None:
 		raise http.Http404(
 		"App %r, model %r, not found."\
 		% (app_label, model_name))
+	
+	return model
+
+
+def to_excel(request, app_label, model_name):
+	model = _get_model(app_label, model_name)
+	rows = []
 	
 	# the first row of column names
 	columns = ["<th>%s</th>" % capfirst(field.verbose_name) for field in model._meta.fields]

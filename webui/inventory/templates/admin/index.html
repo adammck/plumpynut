@@ -18,7 +18,7 @@
     {% for app in app_list %}
         <div class="module">
         <table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
-        <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a></caption>
+        <caption>{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</caption>
         <tbody>
         {% for model in app.models %}
             <tr>
@@ -53,6 +53,8 @@
 
 {% block sidebar %}
 <div id="content-related">
+	{% incl_notifications %}
+	
 	<div class="msg-log">
 		<div class="incomming module">
 			{% incl_messages "in" %}

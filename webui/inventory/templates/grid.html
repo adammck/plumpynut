@@ -2,8 +2,7 @@
 	<caption>Today's Entries</caption>
 	<thead>
 		<tr>
-			<th scope="column">Woreda</th>
-			<th scope="column">OTP</th>
+			<th scope="column">OTP/Woreda</th>
 			<th scope="column" class="tip" title="Number of Beneficiaries">Ben</th>
 			<th scope="column" class="tip" title="Quantity">Qty</th>
 			<th scope="column" class="tip" title="Consumption Quantity">Con</th>
@@ -13,8 +12,7 @@
 	<tbody>
 	{% for entry in entries %}
 		<tr>
-			<td>{{ entry.supply_location.location.area.name }}</td>
-			<th scope="row">{{ entry.supply_location.location.name }}</td>
+			<th scope="row"><span title="{{ entry.supply_place.type }}">{{ entry.supply_place.place }}</span></td>
 			<td>{{ entry.beneficiaries }}</td>
 			<td>{{ entry.quantity }}</td>
 			<td>{{ entry.consumption }}</td>
