@@ -80,7 +80,9 @@ class App(SmsApplication):
 		
 		# something went wrong (probably
 		# missing the Levenshtein library)
-		except: return None
+		except:
+			self.log("Couldn't import Levenshtein library", "err")
+			return None
 		
 		# searches are case insensitive
 		string = string.upper()
