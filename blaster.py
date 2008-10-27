@@ -20,32 +20,33 @@ from webui.inventory.models import *
 # safe_blasts list to control which blaster
 # methods can be invoked from the commandline
 def valid_blast(func):
-	safe_blasts = ['blastTest']
+	safe_blasts = ['blast_test']
 	if func in safe_blasts:
 		return True
 	if func not in safe_blasts:
 		return False
 
-def blastTest():
+def blast_test():
 	# specific blast for testing
-	# only adam and evan have emails
+	# (only adam and evan have emails)
 	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information."
 	peeps = Monitor.objects.filter(email__contains='@')
-	numbers = []
-	for p in peeps:
-		numbers.append(p.phone)
-	return blast(numbers, message, 'alias')
+	return blast_set(peeps, message, 'alias')
 
-def blastOff():
+def blast_off():
 	# specific blast for kicking of uniSMS
 	# in Ethiopia
 	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information."
 	peeps = Monitor.objects.all()
+	return blast_set(peeps, message, 'alias')
+
+def blast_set(queryset, message, field=None):
+	# blast a queryset of Monitors
+	peeps = queryset
 	numbers = []
 	for p in peeps:
 		numbers.append(p.phone)
-	return blast(numbers, message, 'alias')
-
+	return blast(numbers, message, field)
 
 def blast(numbers, message, field=None):
 	# mass SMS blaster to send a message to a
