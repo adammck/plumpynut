@@ -31,26 +31,19 @@ def blast_test():
 	# (only adam and evan have emails)
 	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information."
 	peeps = Monitor.objects.filter(email__contains='@')
-	return blast_set(peeps, message, 'alias')
+	return blast(peeps, message, 'alias')
 
 def blast_off():
 	# specific blast for kicking of uniSMS
 	# in Ethiopia
 	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information."
 	peeps = Monitor.objects.all()
-	return blast_set(peeps, message, 'alias')
+	return blast(peeps, message, 'alias')
 
-def blast_set(queryset, message, field=None):
-	# blast a queryset of Monitors
-	peeps = queryset
-	numbers = []
-	for p in peeps:
-		numbers.append(p.phone)
-	return blast(numbers, message, field)
 
-def blast(numbers, message, field=None):
+def blast(monitors, message, field=None):
 	# mass SMS blaster to send a message to a
-	# list of numbers. Messages to uniSMS Monitors
+	# list of monitors. Messages to uniSMS Monitors
 	# can be personalized by including either 
 	# %(alias)s or %(first_name)s or %(last_name)s or
 	# %(__unicode)s in the message and passing the
@@ -60,38 +53,35 @@ def blast(numbers, message, field=None):
 	
 	sending = 0 
 	sender = kannel.SmsSender("user", "password")
-	for n in numbers:
+	for m in monitors:
+		number = m.phone
 		# passing a field implies that
 		# the message includes
 		# personalizeable strings
 		if field:
-			try:
-				# if a field is given, try to look up the
-				# the Monitor from the number and then
-				# substitute the monitor's attribute
-				# for the personalized string
-				# and send the personalized message
-				m = Monitor.objects.get(phone=n)
-				if hasattr(m, field):
-					attribute = getattr(m,field)
-					pmessage = message % {field : attribute}
-                			sender.send(n, pmessage)
-					sending += 1
-					print 'Blasted to %d of %d recipients...' % (sending, len(numbers))
-					pass
-				else:
-					print "Oops. Monitors don't have %s" % (field)
-					pass
-			except ObjectDoesNotExist:
-				print "Oops. I coudn't find a monitor for %s" % (n)
+
+			# if a field is given, try to
+			# substitute the monitor's attribute
+			# for the personalized string
+			# and send the personalized message
+			if hasattr(m, field):
+				attribute = getattr(m,field)
+				pmessage = message % {field : attribute}
+               			sender.send(number, pmessage)
+				sending += 1
+				print 'Blasted to %d of %d recipients...' % (sending, len(monitors))
 				pass
+			else:
+				print "Oops. Monitors don't have %s" % (field)
+				pass
+
 		# if a field is not given, blast the
-		# message directly to all given numbers
+		# message directly to all given monitors
 		else:
-			sender.send(n, message)
+			sender.send(number, message)
 			sending += 1
-			print 'Blasted to %d of %d recipients...' % (sending, len(numbers))
-        return 'Blasted %s to %d numbers with %d failures' % (message, sending, (len(numbers) - sending))
+			print 'Blasted to %d of %d monitors...' % (sending, len(monitors))
+        return 'Blasted %s to %d monitors with %d failures' % (message, sending, (len(monitors) - sending))
 
 if __name__ == "__main__":
 	import inspect
