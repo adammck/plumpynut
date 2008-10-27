@@ -13,7 +13,7 @@ def incl_grid():
 def incl_messages(type):
 	
 	if type == "in":
-		capt = "Incomming"
+		capt = "Incoming"
 		og = False
 		
 	elif type == "out":
