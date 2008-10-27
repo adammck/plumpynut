@@ -109,7 +109,18 @@ class App(SmsApplication):
 		
 		# nothing was close enough
 		else: return None
+	
+	
+	def new_transaction(self, caller):
+		id = random.randint(11111111, 99999999)
 		
+		# when a new transaction is started, create an
+		# instance to bind the messages sent and received
+		mon = self.__get(Monitor, phone=caller)
+		return Transaction.objects.create(
+			identity=id,
+			phone=caller,
+			monitor=mon)
 	
 	
 	
@@ -395,26 +406,46 @@ class App(SmsApplication):
 	# without interfereing with dispatch
 	def before_incoming(self, caller, msg):
 		
-		# fetch the caller's identity, and log.	we must
-		# log the phone number as well as the monitor
-		# object, because they can (and will) change
-		rep = self.__get(Monitor, phone=caller)
+		# we will log the monitor, if we can identify
+		# them by their number. otherwise, log the number
+		mon = self.__get(Monitor, phone=caller)
+		if mon is None: ph = caller
+		else: ph = None
+		
+		# don't log if the details are the
+		# same as the transaction itself
+		if mon == self.transaction.monitor: mon = None
+		if ph  == self.transaction.phone:   ph  = None
+		
+		# create a new log entry
 		Message.objects.create(
 			transaction=self.transaction,
 			is_outgoing=False,
-			monitor=rep,
 			phone=caller,
+			monitor=mon,
 			message=msg)
 	
 	
 	# as above...
 	def before_outgoing(self, recipient, msg):
-		rep = self.__get(Monitor, phone=recipient)
+		
+		# we will log the monitor, if we can identify
+		# them by their number. otherwise, log the number
+		mon = self.__get(Monitor, phone=recipient)
+		if mon is None: ph = recipient
+		else: ph = None
+		
+		# don't log if the details are the
+		# same as the transaction itself
+		if mon == self.transaction.monitor: mon = None
+		if ph  == self.transaction.phone:   ph  = None
+		
+		# create a new log entry
 		Message.objects.create(
 			transaction=self.transaction,
 			is_outgoing=True,
-			monitor=rep,
 			phone=recipient,
+			monitor=mon,
 			message=msg)
 
 
