@@ -1,17 +1,20 @@
-/* Name and/or Title
+/* Dashboard
  * vim:set noet:
  * --
- * Two or three lines of purpose and/or
- * justification for the existence of this */
+ * Add to the default Django admin styles,
+ * to make the dashboard a little more useful */
 
 
 /* import the default django stylesheet first */
 @import url("/assets/admin/css/dashboard.css");
 
+/* import ie6 hacks and fixes */
+@import url("/assets/css/dashboard-ie6.css");
+
+
 /* make tables full width */
 .dashboard #content,
 .dashboard #content .events { width: auto; }
-/*.dashboard .module { width: 50%; }*/
 
 
 /* make the sidebar considerably wider,

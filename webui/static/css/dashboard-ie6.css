@@ -1,0 +1,23 @@
+/* Dashboard IE6 fixes
+ * vim:set noet:
+ * --
+ * The dashboard is kind of complicated, and
+ * IE6 makes a huge mess of it, so here are
+ * a bunch of ugly hacks to fix things */
+
+
+* html .dashboard #content {
+	position: relative;
+	margin: 0 !important;
+	width: 930px;
+	padding: 15px;
+}
+
+* html .dashboard #content-main {
+	width: 460px;
+}
+
+* html .dashboard #content-related {
+	width: 460px;
+	float: right;
+}
