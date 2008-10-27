@@ -27,8 +27,13 @@ def valid_blast(func):
 		return False
 
 def blastTest():
+	# specific blast for testing
+	# only adam and evan have emails
 	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information."
-        numbers = ['251911505181', '251911385921']
+	peeps = Monitor.objects.filter(email__contains='@')
+	numbers = []
+	for p in peeps:
+		numbers.append(p.phone)
 	return blast(numbers, message, 'alias')
 
 def blastOff():
@@ -103,7 +108,8 @@ if __name__ == "__main__":
 		# try to call a method with the name of the argument
 		if (len(sys.argv) == 2):
 			try:
-				# check agains valid_blast so only
+
+				# check against valid_blast so only
 				# legit blasts can be executed
 				if (valid_blast(sys.argv[1])):
 					func = sys.argv[1] + '()'
@@ -113,6 +119,7 @@ if __name__ == "__main__":
 					"Oops. You aren't allowed to call %s from the commandline" % (sys.argv[1])
 			except:
 				"Oops. I coudn't find a blaster method called %s" % (sys.argv[1])
+
 		numbers = []	
 		message = False
 		field = None
