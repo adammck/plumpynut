@@ -44,6 +44,15 @@
 
 
 
+/* ---- notifications ---- */
+
+	/* prevent long alerts from blowing up the layout */
+	.dashboard #content-related .notifications td.msg {
+		white-space: normal; }
+
+
+
+
 /* ---- transaction log ---- */
 
 	/* remove padding from cell, since nested
