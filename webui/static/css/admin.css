@@ -14,11 +14,16 @@ body {
 	background: #fff;
 }
 
+	/* no scaling for ie6 */
+	* html #container {
+		width: 960px; }
+
 /* steal header bg from unicef.org */
 #header {
 	background: url("../gif/header.gif") repeat-x;
 	padding-top: 23px;
 	padding-bottom: 33px;
+	position: relative;
 }
 	
 	/* align in the middle of the
@@ -30,6 +35,12 @@ body {
 		color: #fff;
 		margin: 0;
 	}
+	
+		/* ie6 can't seem to
+		 * figure this out */
+		* html #branding h1 {
+			width: 940px;
+		}
 	
 		/* hide text title on login box;
 		 * it's too long (blows up form) */
