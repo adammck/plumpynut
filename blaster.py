@@ -16,6 +16,16 @@ setup_environ(settings)
 # somewhere sensible at the earliest opportunity
 from webui.inventory.models import *
 
+# returns true or false based on the included
+# safe_blasts list to control which blaster
+# methods can be invoked from the commandline
+def valid_blast(func):
+	safe_blasts = ['blastTest']
+	if func in safe_blasts:
+		return True
+	if func not in safe_blasts:
+		return False
+
 def blastTest():
 	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information."
         numbers = ['251911505181', '251911385921']
@@ -54,6 +64,7 @@ def blast(numbers, message, field=None):
 				# the Monitor from the number and then
 				# substitute the monitor's attribute
 				# for the personalized string
+				# and send the personalized message
 				m = Monitor.objects.get(phone=n)
 				if hasattr(m, field):
 					attribute = getattr(m,field)
@@ -77,10 +88,31 @@ def blast(numbers, message, field=None):
         return 'Blasted %s to %d numbers with %d failures' % (message, sending, (len(numbers) - sending))
 
 if __name__ == "__main__":
+	import inspect
 	import sys
+	# here is an example commandline invocation with arguments:
+	# ./blaster.py ['251911505181', '251911385921'] "Welcome to uniSMS!\
+	#  Your number is now registered to %(alias)s. Reply with \
+	# 'help' for more information." alias
+
 	# if blaster.py is called with arguments
 	# try to make sense of them
 	if sys.argv:
+
+		# if only one argument is given (in addition to filename)
+		# try to call a method with the name of the argument
+		if (len(sys.argv) == 2):
+			try:
+				# check agains valid_blast so only
+				# legit blasts can be executed
+				if (valid_blast(sys.argv[1])):
+					func = sys.argv[1] + '()'
+					print 'Calling %s ...' % (func)
+					eval(func)
+				else:
+					"Oops. You aren't allowed to call %s from the commandline" % (sys.argv[1])
+			except:
+				"Oops. I coudn't find a blaster method called %s" % (sys.argv[1])
 		numbers = []	
 		message = False
 		field = None
