@@ -3,20 +3,24 @@
 	<thead>
 		<tr>
 			<th scope="column">OTP/Woreda</th>
+			<th scope="column">Code</th>
 			<th scope="column" class="tip" title="Number of Beneficiaries">Ben</th>
 			<th scope="column" class="tip" title="Quantity">Qty</th>
 			<th scope="column" class="tip" title="Consumption Quantity">Con</th>
 			<th scope="column" class="tip" title="Balance at OTP">Bal</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
 	{% for entry in entries %}
 		<tr>
 			<th scope="row"><span title="{{ entry.supply_place.type }}">{{ entry.supply_place.place }}</span></td>
+			<td>{{ entry.supply_place.place.code }}</td>
 			<td>{{ entry.beneficiaries }}</td>
 			<td>{{ entry.quantity }}</td>
 			<td>{{ entry.consumption }}</td>
 			<td>{{ entry.balance }}</td>
+			<td><a class="changelink" title="Change this Entry" href="/inventory/entry/{{ entry.pk }}/">Change</a></td>
 		</tr>
 	{% endfor %}
 	</tbody>
