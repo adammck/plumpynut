@@ -40,14 +40,45 @@
  * because there's a whole lot of data */
 .dashboard #content-related td {
 	font-size: 10px; }
-	
-/* allow the logs to wrap, since their
- * contents are important and quite long */
-.dashboard #content-related td.msg {
-	white-space: normal; }
 
-	.dashboard #content-related td.msg a {
-		color: #000; }
+
+
+
+/* ---- transaction log ---- */
+
+	/* remove padding from cell, since nested
+	 * table has plenty of it's own padding */
+	.dashboard #content-related td.messages {
+		padding: 0; }
+
+	/* make the nested table more succinct than most */
+	.dashboard #content-related td.messages table td {
+		white-space: normal;
+		border: none;
+		padding: 4px;
+	}
+
+	/* incoming/outgoing indicator [raq/laq]uo */
+	.dashboard #content-related td.messages table td.dir {
+		font-weight: bold;
+		width: 1%;
+	}
+
+	/* colorize cells to indicate direction */
+	.dashboard #content-related td.messages table tr.in td.dir  { color: #f00; }
+	.dashboard #content-related td.messages table tr.in { background: #fff8ff; }
+	.dashboard #content-related td.messages tr.out td.dir { color: #0f0; }
+	.dashboard #content-related td.messages tr.out { background: #f8ffff; }
+
+	/* for messages that aren't explicitly linked to a monitor,
+	 * include the destination number off to the right */
+	.dashboard #content-related td.messages table span.to {
+		float: right;
+		color: #aaa
+	}
+
+
+
 
 /* remove the default TH rule, which blows up our fancy
  * events table, and replace it with a more specific rule */

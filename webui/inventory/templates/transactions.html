@@ -10,14 +10,18 @@
 	{% for t in transactions %}
 		<tr>
 			{% if t.monitor %}<td class="monitor"><a href="/inventory/monitor/{{ t.monitor.pk }}/">{{ t.monitor }}</a>{% else %}{% if t.phone %}<td class="phone">{{ t.phone }}{% else %}<td class="monitor dull">Unknown{% endif %}{% endif %}</td>
-			<td>
-				<table class="messages">
+			<td class="messages">
+				<table>
 					{% for m in t.message_set.all %}
-					<tr><td class="{% if m.is_outgoing %}out{% else %}in{% endif %}">
-						{% if m.monitor %}<span class="to" title="Number: {{ m.monitor.phone }}">To: {{ m.monitor }}</span>{% else %}
-						{% if m.phone %}{% ifnotequal t.phone m.phone %}<span class="to">To: {{ m.phone }}</span>{% endifnotequal %}{% endif %}{% endif %}
-						{{ m.message }}
-					</td></tr>
+					<tr class="{% if m.is_outgoing %}out{% else %}in{% endif %}{% if forloop.first %} first{% endif %}{% if forloop.last %} last{% endif %}">
+						<td class="dir"{% if m.is_outgoing %} title="Outgoing">&raquo;{% else %} title="Incoming">&laquo;{% endif %}</td>
+						
+						<td class="msg">
+							{% if m.monitor %}<span class="to" title="Number: {{ m.monitor.phone }}">To: {{ m.monitor }}</span>{% else %}
+							{% if m.phone %}{% ifnotequal t.phone m.phone %}<span class="to">To: {{ m.phone }}</span>{% endifnotequal %}{% endif %}{% endif %}
+							<span title="{% if m.is_outgoing %}Sent{% else %}Received{% endif %} at: {{ m.time }}">{{ m.message }}</span>
+						</td>
+					</tr>
 					{% endfor %}
 				</table>
 			</td>
