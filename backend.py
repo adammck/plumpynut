@@ -227,7 +227,7 @@ class App(SmsApplication):
 				.order_by('-time')[0]
 			
 			# delete it and notify
-			entry.delete()
+			latest.delete()
 			self.respond(STR["cancel_ok"])
 		
 		except (ObjectDoesNotExist, IndexError):

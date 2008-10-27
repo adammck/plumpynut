@@ -29,14 +29,14 @@ def valid_blast(func):
 def blast_test():
 	# specific blast for testing
 	# (only adam and evan have emails)
-	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information or get started!"
+	message = "Welcome to uniSMS! Your mobile number is now registered to %(alias)s. Reply with 'help' for more information or get started!"
 	peeps = Monitor.objects.filter(email__contains='@')
 	return blast(peeps, message, 'alias')
 
 def blast_off():
 	# specific blast for kicking of uniSMS
 	# in Ethiopia
-	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information or get started!"
+	message = "Welcome to uniSMS! Your mobile number is now registered to %(alias)s. Reply with 'help' for more information or get started!"
 	peeps = Monitor.objects.all()
 	return blast(peeps, message, 'alias')
 
@@ -69,11 +69,9 @@ def blast(monitors, message, field=None):
 				pmessage = message % {field : attribute}
                			sender.send(number, pmessage)
 				sending += 1
-				print 'Blasted to %d of %d recipients...' % (sending, len(monitors))
-				pass
+				print 'Blasted to %d of %d recipients... %s' % (sending, len(monitors), m.details)
 			else:
 				print "Oops. Monitors don't have %s" % (field)
-				pass
 
 		# if a field is not given, blast the
 		# message directly to all given monitors
@@ -81,7 +79,11 @@ def blast(monitors, message, field=None):
 			sender.send(number, message)
 			sending += 1
 			print 'Blasted to %d of %d monitors...' % (sending, len(monitors))
-        return 'Blasted %s to %d monitors with %d failures' % (message, sending, (len(monitors) - sending))
+
+        print 'Blasted...'
+	print '%s' % (message)
+	print '...to %d monitors with %d failures' % (sending, (len(monitors) - sending))
+	return
 
 
 def blast_numbers(numbers, message):
@@ -146,7 +148,7 @@ if __name__ == "__main__":
 	# if blaster.py is called without arguments
 	# prompt for arguments
 	else:
-		numbers = input("Please enter a list of phone numbers to receive SMS (eg, ['12345', '12346']) : ")
-		message = raw_input("Please enter a message to blast to these recipients (you may specify a personalized word by using %(alias)s or %(first_name)s or %(last_name)s or %(__unicode__)s ):").strip()
+		numbers = input("Please enter a list of phone numbers to receive SMS blast (eg, ['12345', '12346']): ")
+		message = raw_input("Please enter a message to blast to these recipients:").strip()
 
 		blast_numbers(numbers, message)
