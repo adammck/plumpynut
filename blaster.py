@@ -29,14 +29,14 @@ def valid_blast(func):
 def blast_test():
 	# specific blast for testing
 	# (only adam and evan have emails)
-	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information."
+	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information or get started!"
 	peeps = Monitor.objects.filter(email__contains='@')
 	return blast(peeps, message, 'alias')
 
 def blast_off():
 	# specific blast for kicking of uniSMS
 	# in Ethiopia
-	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information."
+	message = "Welcome to uniSMS! Your number is now registered to %(alias)s. Reply with 'help' for more information or get started!"
 	peeps = Monitor.objects.all()
 	return blast(peeps, message, 'alias')
 
@@ -83,13 +83,21 @@ def blast(monitors, message, field=None):
 			print 'Blasted to %d of %d monitors...' % (sending, len(monitors))
         return 'Blasted %s to %d monitors with %d failures' % (message, sending, (len(monitors) - sending))
 
+
+def blast_numbers(numbers, message):
+	# blasts a message to a list of numbers
+	sending = 0
+	sender = kannel.SmsSender("user", "password")
+	for n in numbers:
+		sender.send(n, message)
+		sending += 1
+		print 'Blasted to %d of %d numbers...' % (sending, len(numbers))
+        return 'Blasted %s to %d numbers with %d failures' % (message, sending, (len(numbers) - sending))
+		
+
 if __name__ == "__main__":
 	import inspect
 	import sys
-	# here is an example commandline invocation with arguments:
-	# ./blaster.py ['251911505181', '251911385921'] "Welcome to uniSMS!\
-	#  Your number is now registered to %(alias)s. Reply with \
-	# 'help' for more information." alias
 
 	# if blaster.py is called with arguments
 	# try to make sense of them
@@ -113,7 +121,6 @@ if __name__ == "__main__":
 
 		numbers = []	
 		message = False
-		field = None
 
 		# iterate all given arguments
 		# except for the first (./blaster.py)
@@ -132,23 +139,14 @@ if __name__ == "__main__":
 				if not message:
 					message = arg
 
-			# if we are still looping and have a
-			# message, try to assign optional
-			# field argument
-			try:
-				if(message):
-					field = arg
-			except:
-				field = None
 
 		# blast away	
-		blast(numbers, message, field)
+		blast_numbers(numbers, message)
 
 	# if blaster.py is called without arguments
 	# prompt for arguments
 	else:
 		numbers = input("Please enter a list of phone numbers to receive SMS (eg, ['12345', '12346']) : ")
 		message = raw_input("Please enter a message to blast to these recipients (you may specify a personalized word by using %(alias)s or %(first_name)s or %(last_name)s or %(__unicode__)s ):").strip()
-		field = raw_input("Please enter any personalized word from your message or press enter to send (eg, alias or first_name or last_name or __unicode__):").strip()
 
-		blast(numbers, message, field)
+		blast_numbers(numbers, message)
