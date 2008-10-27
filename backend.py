@@ -281,6 +281,14 @@ class App(SmsApplication):
 	def help_report(self, caller):
 		self.respond(STR["help_report"])
 	
+	@kw("register", "identify")
+	def help_report(self, caller):
+		self.respond(STR["help_reg"])
+	
+	@kw("alert")
+	def help_report(self, caller):
+		self.respond(STR["help_alert"])
+	
 	@kw.invalid()
 	def help_help(self, caller):
 		self.respond(STR["help_help"])
