@@ -57,9 +57,43 @@ def blast(numbers, message, field=None):
         return 'Blasted %s to %d numbers with %d failures' % (message, sending, (len(numbers) - sending))
 
 if __name__ == "__main__":
+	import sys
+	# if blaster.py is called with arguments
+	# try to make sense of them
+	if sys.argv:
+		numbers = []	
+		message = False
+		field = None
+		# iterate all given arguments
+		# except for the first (./blaster.py)
+		for arg in sys.argv[1:]:
+			# strip brackets and commas from the argument
+			# (we expect a list of numbers as strings)
+			num = arg.strip('[,]')
+			if num.isdigit():
+				numbers.append(num)
+			# if there are no more numbers and message
+			# has not been set, assume this arg is
+			# the message
+			else:
+				if not message:
+					message = arg
+			# if we are still looping and have a
+			# message, try to assign optional
+			# field argument
+			try:
+				if(message):
+					field = arg
+			except:
+				field = None
+		# blast away	
+		blast(numbers, message, field)
 
-	numbers = input("Please enter a list of phone numbers to receive SMS (eg, ['12345', '12346']) : ")
-	message = raw_input("Please enter a message to blast to these recipients (you may specify a personalized word by using %(alias)s or %(first_name)s or %(last_name)s or %(__unicode__)s ):").strip()
-	field = raw_input("Please enter any personalized word from your message or press enter to send (eg, alias or first_name or last_name or __unicode__):").strip()
+	# if blaster.py is called without arguments
+	# prompt for arguments
+	else:
+		numbers = input("Please enter a list of phone numbers to receive SMS (eg, ['12345', '12346']) : ")
+		message = raw_input("Please enter a message to blast to these recipients (you may specify a personalized word by using %(alias)s or %(first_name)s or %(last_name)s or %(__unicode__)s ):").strip()
+		field = raw_input("Please enter any personalized word from your message or press enter to send (eg, alias or first_name or last_name or __unicode__):").strip()
 
-	blast(numbers, message, field)
+		blast(numbers, message, field)
