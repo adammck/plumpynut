@@ -25,6 +25,14 @@ def incl_messages(type):
 		"messages": Message.objects.filter(is_outgoing=og).order_by("-time")[:10]
 	}
 
+
+@register.inclusion_tag("transactions.html")
+def incl_transactions():
+	return {
+		"transactions": Transaction.objects.filter().order_by("-id")[:10]
+	}
+
+
 @register.inclusion_tag("notifications.html")
 def incl_notifications():
 	return {

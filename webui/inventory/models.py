@@ -190,6 +190,7 @@ class Report(models.Model):
 	number_of_entries = property(_get_number_of_entries)
 	latest_entry = property(_get_latest_entry)
 
+
 class Entry(models.Model):
 	monitor = models.ForeignKey(Monitor, help_text="Field monitor")
 	supply_place = models.ForeignKey(SupplyPlace, help_text="Reporting location")
@@ -206,14 +207,35 @@ class Entry(models.Model):
 	class Meta:
 		verbose_name_plural="Entries"
 
-class Message(models.Model):
-	transaction = models.PositiveIntegerField(blank=True, null=True)
+
+class Transaction(models.Model):
+	identity = models.PositiveIntegerField(blank=True, null=True)
+	
+	# the monitor (or number, if monitor isn't known)
+	# who triggered the creation of this transaction
+	# ----
+	# todo: validate that at least one of these is provided
+	phone = models.CharField(max_length=30, blank=True, null=True)
 	monitor = models.ForeignKey(Monitor, blank=True, null=True)
-	phone = models.CharField(max_length=30)
+	
+	def __unicode__(self):
+		return unicode(self.identity)
+
+
+class Message(models.Model):
+	transaction = models.ForeignKey(Transaction, blank=True, null=True)
+	
+	# these are only needed if the message is not bound to a
+	# transaction, or the message going out to someone else
+	phone = models.CharField(max_length=30, blank=True, null=True)
+	monitor = models.ForeignKey(Monitor, blank=True, null=True)
+	
+	# but every message has these
 	time = models.DateTimeField(auto_now_add=True)
 	message = models.CharField(max_length=160)
 	is_outgoing = models.BooleanField()
 	
+	# todo: what is this for? the screen log?
 	def __unicode__(self):
 		if self.is_outgoing: dir = ">>"
 		else:                dir = "<<"
