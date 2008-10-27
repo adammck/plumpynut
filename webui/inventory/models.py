@@ -195,10 +195,10 @@ class Entry(models.Model):
 	monitor = models.ForeignKey(Monitor, help_text="Field monitor")
 	supply_place = models.ForeignKey(SupplyPlace, help_text="Reporting location")
 	time = models.DateTimeField(auto_now_add=True)
-	beneficiaries = models.PositiveIntegerField(blank=True, null=True, help_text="Number of benficiaries")
-	quantity = models.PositiveIntegerField(blank=True, null=True, help_text="Quantity")
-	consumption = models.PositiveIntegerField(blank=True, null=True, help_text="Consumption quantity")
-	balance = models.PositiveIntegerField(blank=True, null=True, help_text="Balance at OTP")
+	beneficiaries = models.PositiveIntegerField(null=True, help_text="Number of benficiaries")
+	quantity = models.PositiveIntegerField(null=True, help_text="Quantity")
+	consumption = models.PositiveIntegerField(null=True, help_text="Consumption quantity")
+	balance = models.PositiveIntegerField(null=True, help_text="Balance at OTP")
 
 	def __unicode__(self):
 		return "%s on %s" %\
