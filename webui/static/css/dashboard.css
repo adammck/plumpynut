@@ -41,6 +41,15 @@
 .dashboard #content-related td {
 	font-size: 10px; }
 
+/* hide the captions on the add and change
+ * links, to make more room for data */
+.dashboard #content a.changelink,
+.dashboard #content a.addlink {
+	padding-right: 0;
+	overflow: hidden;
+	width: 0;
+}
+
 
 
 
