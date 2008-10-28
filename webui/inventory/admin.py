@@ -93,3 +93,7 @@ admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Report, ReportAdmin)
 admin.site.register(Entry, EntryAdmin)
 
+# temporarily, allow the message logs
+# to be altered, to remove testing junk
+admin.site.register(Transaction)
+
