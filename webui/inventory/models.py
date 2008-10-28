@@ -224,7 +224,15 @@ class Transaction(models.Model):
 	monitor = models.ForeignKey(Monitor, blank=True, null=True)
 	
 	def __unicode__(self):
-		return unicode(self.identity)
+		
+		# prefer to show a monitor,
+		# fall back to phone number
+		who = self.monitor
+		if who is None:
+			who = self.phone
+		
+		# include the random identity and creator
+		return "%s by %s" % (unicode(self.identity), who)
 
 
 class Message(models.Model):
