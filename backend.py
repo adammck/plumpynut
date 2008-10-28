@@ -202,7 +202,7 @@ class App(SmsApplication):
 	def alert(self, caller, notice):
 		monitor = self.__identify(caller, "alerting")
 		Notification.objects.create(monitor=monitor, resolved=0, notice=notice)
-		self.respond(STR["alert_ok"])
+		self.respond(STR["alert_ok"] % (monitor.alias))
 	
 	@kw.blank()
 	def alert_help(self, caller, *msg):
@@ -228,10 +228,10 @@ class App(SmsApplication):
 			
 			# delete it and notify
 			latest.delete()
-			self.respond(STR["cancel_ok"])
+			self.respond(STR["cancel_ok"] % (monitor.alias))
 		
 		except (ObjectDoesNotExist, IndexError):
-			raise CallerError(STR["cancel_none"])
+			raise CallerError(STR["cancel_none"] % (monitor.alias))
 	
 	@kw.invalid()
 	def cancel_help(self, caller, *msg):
@@ -251,21 +251,6 @@ class App(SmsApplication):
 	@kw.invalid()
 	def supplies_help(self, caller):
 		raise CallerError(STR["supplies_help"])
-	
-	
-	
-	
-	# LOCATIONS ---------------------------------------------------------------
-	kw.prefix = ["locations", "locs", "otp", "otps"]
-	
-	@kw.blank()
-	def locations(self, caller):
-		self.respond(["%s: %s" % (l.code, l.name)\
-			for l in Location.objects.all()])
-	
-	@kw.invalid()
-	def locations_help(self, caller):
-		raise CallerError(STR["locations_help"])
 	
 	
 	
@@ -293,9 +278,44 @@ class App(SmsApplication):
 	def help_help(self, caller):
 		self.respond(STR["help_help"])
 
+
+	
+	# CONVERSATIONAL  ------------------------------------------------------------
+	kw.prefix = ["ok", "thanks", "thank you"]
+	
+	@kw.blank()
+	@kw("(whatever)")
+	@kw.invalid()
+	def conv_welc(self, caller):
+		monitor = self.__identify(caller, "thanking")
+		self.respond(STR["conv_welc"] % (monitor))
+	
+
+	kw.prefix = ["hi", "hello", "howdy", "whats up"]
+
+	@kw.blank()
+	@kw("(whatever)")
+	@kw.invalid()
+	def conv_greet(self, caller, whatever=None):
+		monitor = self.__get(Monitor, phone=caller)
+		if monitor.phone == caller:
+			self.respond(STR["ident"] % (monitor))
+		self.respond(STR["conv_greet"])
+
+
+	kw.prefix = ["fuck", "damn", "shit", "bitch"]
+
+	@kw.blank()
+	@kw("(whatever)")
+	@kw.invalid()
+	def conv_swear(self, caller, whatever=None):
+		monitor = self.__get(Monitor, phone=caller)
+		if monitor.phone == caller:
+			self.respond(STR["conv_swear"] % (monitor))
+		self.respond(STR["conv_greet"])
 	
 	
-	
+
 	# <SUPPLY> <PLACE> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
 	kw.prefix = ""
 	
@@ -399,7 +419,8 @@ class App(SmsApplication):
 
 
 	
-	
+
+
 	# NO IDEA WHAT THE CALLER WANTS -------------------------------------------
 	
 	def incoming_sms(self, caller, msg):
