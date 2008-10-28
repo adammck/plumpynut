@@ -15,6 +15,7 @@ class Monitor(models.Model):
 	
 	class Meta:
 		verbose_name = "Field Monitor"
+		ordering = ['last_name']
 	
 	# the string version of monitors
 	# now contains only their name
@@ -92,6 +93,7 @@ class Area(models.Model):
 	
 	class Meta:
 		verbose_name = "Woreda"
+		ordering = ['name']
 	
 	def __unicode__(self):
 		#return "%s (%s)" % (self.name, self.code)
@@ -119,6 +121,7 @@ class Location(models.Model):
 	
 	class Meta:
 		verbose_name = "OTP"
+		ordering = ['name']
 	
 	def __unicode__(self):
 		#return "%s (%s)" % (self.name, self.code)
