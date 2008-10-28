@@ -83,14 +83,6 @@ body {
 		border-top: none;
 		margin-top: 15px;
 	}
-	
-	/* hide the captions on the add and change
-	 * links, to make more room for data */
-	#content a.changelink, #content a.addlink {
-		padding-right: 0;
-		overflow: hidden;
-		width: 0;
-	}
 
 
 /* the footer doesn't seem to be in
