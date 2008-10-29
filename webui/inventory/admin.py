@@ -7,14 +7,16 @@ from models import *
 from forms import *
 
 
-class MonitorAdmin(admin.ModelAdmin):
-	form = MonitorForm
-	list_display = ('__unicode__', 'alias', 'phone', 'email')
-	search_fields = ('__unicode__', 'alias')
-
-
 class EntryInline(admin.TabularInline):
 	model = Entry
+
+class MonitorAdmin(admin.ModelAdmin):
+	form = MonitorForm
+	list_display = ('__unicode__', 'alias', 'phone', 'email', 'latest_report')
+	search_fields = ('__unicode__', 'alias')
+	inlines = [EntryInline]
+
+
 
 
 class EntryAdmin(admin.ModelAdmin):

@@ -23,6 +23,17 @@ class Monitor(models.Model):
 			(self.first_name,
 			self.last_name)
 	
+	def _get_latest_report(self):
+		try:
+			return Entry.objects.filter(monitor=self).order_by('-time')[0]
+		
+		except IndexError:
+			return "N/A"
+
+	latest_report = property(_get_latest_report)
+	
+	
+	
 	# 'summarize' the field monitor by
 	# returning his full name and number
 	def _get_details(self):

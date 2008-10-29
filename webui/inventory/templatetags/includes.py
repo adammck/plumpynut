@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 # vim: noet
 
+from datetime import datetime
+
 from inventory.models import *
 from django import template
 register = template.Library()
 
 @register.inclusion_tag("grid.html")
 def incl_grid():
-	return {"entries": Entry.objects.all()}
+	today = datetime.today().date()
+	return {"entries": Entry.objects.filter(time__gte=today)}
 
 @register.inclusion_tag("messages.html")
 def incl_messages(type):
