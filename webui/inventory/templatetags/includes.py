@@ -25,3 +25,8 @@ def incl_messages(type):
 		"messages": Message.objects.filter(is_outgoing=og).order_by("-time")[:10]
 	}
 
+@register.inclusion_tag("send.html")
+def incl_send():
+	return {
+		"monitors": Monitor.objects.all()
+	}
