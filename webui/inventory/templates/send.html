@@ -1,20 +1,20 @@
 <div class="send module">
 <form action="/send_sms/" method="post">
 <fieldset>
-Recipients:
 	<div class="recipients">
+	Recipients:
 		{% for m in monitors %}
-         <div>
-		<input type="checkbox" value="{{ m.pk }}" id="send-to-{{ m.pk }}" name="monitor-{{ m.pk }}" checked="true"/>
-		<label for="send-to-{{ m.pk }}">{{ m }}</label>
-	</div>
+	         <div>
+			<input type="checkbox" value="{{ m.pk }}" id="send-to-{{ m.pk }}" name="monitor-{{ m.pk }}" checked="true"/>
+			<label for="send-to-{{ m.pk }}">{{ m }}</label>
+		</div>
 		{% endfor %}
 	</div>
-<div class="textarea"><div>
+	<div class="textarea"><div>
 	<!-- wrapped for nice graphical borders -->
-<textarea name="sms_text" id="send-sms-text"></textarea>
-</div></div>
-<input type="submit" value="Send" />
+	<textarea name="sms_text" id="send-sms-text"></textarea>
+	</div></div>
+	<input type="submit" value="Send" />
 </fieldset>
 </form>
 </div>
