@@ -5,8 +5,8 @@ Recipients:
 	<div class="recipients">
 		{% for m in monitors %}
          <div>
-		<input type="checkbox" value="{{ m.id }}" id="send-to-{{m.id}} name="{{monitor-m.pk}}" checked=true/>
-		<label for "send-to-{{ m.id }}>{{ m}}</label>
+		<input type="checkbox" value="{{ m.pk }}" id="send-to-{{ m.pk }}" name="monitor-{{ m.pk }}" checked="true"/>
+		<label for="send-to-{{ m.pk }}">{{ m }}</label>
 	</div>
 		{% endfor %}
 	</div>
