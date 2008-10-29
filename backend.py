@@ -225,10 +225,10 @@ class App(SmsApplication):
 				time__gt=date.today(),
 				monitor=monitor)\
 				.order_by('-time')[0]
-			
+			latest_desc = latest.supply_place	
 			# delete it and notify
 			latest.delete()
-			self.respond(STR["cancel_ok"] % (monitor.alias))
+			self.respond(STR["cancel_ok"] % (monitor.alias, latest_desc))
 		
 		except (ObjectDoesNotExist, IndexError):
 			raise CallerError(STR["cancel_none"] % (monitor.alias))
