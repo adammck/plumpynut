@@ -33,7 +33,7 @@ def incl_messages(type):
 def incl_send():
 	return {
 		"monitors": Monitor.objects.all()
-
+	}
 
 @register.inclusion_tag("transactions.html")
 def incl_transactions():
