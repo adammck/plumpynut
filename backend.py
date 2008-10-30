@@ -111,6 +111,8 @@ class App(SmsApplication):
 		else: return None
 	
 	
+	
+	
 	def new_transaction(self, caller):
 		id = random.randint(11111111, 99999999)
 		
@@ -290,7 +292,7 @@ class App(SmsApplication):
 		self.respond(STR["help_alert"])
 	
 	@kw.invalid()
-	def help_help(self, caller):
+	def help_help(self, caller, *msg):
 		self.respond(STR["help_help"])
 
 	
@@ -403,7 +405,55 @@ class App(SmsApplication):
 	# NO IDEA WHAT THE CALLER WANTS -------------------------------------------
 	
 	def incoming_sms(self, caller, msg):
-		raise CallerError(STR["error"])
+		self.log("No keyword match. Attempting to guess...", "warn")
+		
+		# we will only attempt to guess if
+		# it looks like the caller is trying
+		# to use these functions
+		guess_funcs = (
+			self.identify,
+			self.report,
+			self.alert)
+		
+		while(len(msg) > 0):
+			found = False
+			
+			# iterate each guessable function, and each
+			# of its regexen without their tailing DOLLAR.
+			# since we couldn't find a real match, we're
+			# looking for a matching prefix (in case the
+			# sender has appended junk to their message,
+			# or concatenated multiple messages without
+			# proper delimitors)
+			for func in guess_funcs:
+				for regex in getattr(func, "regexen"):
+					pattern = regex.pattern.rstrip("$")
+					new_regex = re.compile(pattern, re.IGNORECASE)
+					
+					# does the message START with
+					# the applied pattern?
+					match = new_regex.match(msg)
+					if match:
+						
+						# log and dispatch the matching part, as if
+						# it were a regular incoming message
+						self.log("Matched prefix: %r" % (func.func_name), "info")
+						self.dispatch_incoming_sms(caller, match.group(0))
+				
+						# drop the part of the message
+						# that we just dealt with, and
+						# continue with the next iteration
+						msg = new_regex.sub("", msg, 1).strip()
+						#if(len(msg)>0): self.log("Remaining text: %r" % msg, "info")
+						#else: self.log("Finished parsing message")
+						found = True
+						break
+			
+			# nothing matched in this iteration,
+			# so it won't ever. abort :(
+			if not found:
+				self.log("No match for: %r" % (msg), "warn")
+				raise CallerError(STR["error"])
 
 
 
