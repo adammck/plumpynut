@@ -45,7 +45,7 @@ class App(SmsApplication):
 		# them a message asking them to do so, and
 		# stop further processing
 		if not monitor:
-			msg = "Please identify yourself"
+			msg = "Please register your mobile number"
 			if task: msg += " before %s" % (task)
 			msg += ", by replying: I AM <USERNAME>"
 			raise CallerError(msg)

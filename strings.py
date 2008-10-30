@@ -15,7 +15,7 @@ ENGLISH = {
 	"ident_help":     SORRY + "Please tell me who you are by replying: I AM <USERNAME>",	
 	"whoami":         "You are %s",
 	"whoami_unknown": "I don't know who you are. Please tell me by replying: I AM <USERNAME>",
-	"whoami_help":    SORRY + "To find out who you are identified as, please reply: WHO AM I",
+	"whoami_help":    SORRY + "To find out who you are registered as, please reply: WHO AM I",
 	"whois":          "%s is %s",
 	"whois_help":     SORRY + "Please tell me who you are searching for, by replying: WHO IS <USERNAME>",
 	"alert_ok":       "Thank you. Your alert was received and sent to UNICEF",
@@ -26,8 +26,8 @@ ENGLISH = {
 	"supplies_help":  SORRY + "To list all supply codes, please reply: SUPPLIES",
 	"locations_help": SORRY + "To list all location codes, please reply: LOCATIONS",
 	
-	"help_main":   "Help options: IDENTIFY, REPORT or ALERT",
-	"help_help":   SORRY + "Please reply: HELP IDENTIFY, HELP REPORT or HELP ALERT",
+	"help_main":   "Help options: REGISTER, REPORT or ALERT",
+	"help_help":   SORRY + "Please reply: HELP REGISTER, HELP REPORT or HELP ALERT",
 	"help_report": "To make a report, please reply: <SUPPLY-CODE> <LOCATION-CODE> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE>"
 }
 

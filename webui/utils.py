@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # vim: noet
 
+import kannel
+from smsapp import *
+#from strings import ENGLISH as STR
 
 import csv, sys
 from random import choice 
@@ -16,9 +19,6 @@ setup_environ(settings)
 from webui.inventory.models import * 
 
 def blast(monitors, message, field=None):
-	import kannel
-	from smsapp import *
-	#from strings import ENGLISH as STR
 	
 	# mass SMS blaster to send a message to a
 	# list of monitors. Messages to uniSMS Monitors
@@ -58,10 +58,8 @@ def blast(monitors, message, field=None):
 			sending += 1
 			print 'Blasted to %d of %d monitors...' % (sending, len(monitors))
 
-        print 'Blasted...'
-	print '%s' % (message)
-	print '...to %d monitors with %d failures' % (sending, (len(monitors) - sending))
-	return
+        return "Blasted... '%s' ...to %d monitors with %d failures" % (message, sending, (len(monitors) - sending))
+	
 
 
 def import_places():
