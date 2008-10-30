@@ -3,26 +3,94 @@
 		<fieldset>
 						
 			<table>
-				<caption>Broadcast Message</caption>
+				<caption>Send a Message to Field Monitor(s)</caption>
 				<tbody>
 					<tr>
-						<td class="form">
+						<td class="form" id="bcast-form">
 							<div class="textarea"><div>
-							<!-- wrapped for nice graphical borders -->
-							<textarea name="sms_text" id="send-sms-text"></textarea>
+								<textarea name="message"></textarea>
 							</div></div>
 	
 							<input type="submit" value="Send" />
 						</td>
 						<td>
-							<div class="recipients">
+							<div class="recipients" id="send-recipients">
 								{% for m in monitors %}
 								<div>
-									<input type="checkbox" value="{{ m.pk }}" id="send-to-{{ m.pk }}" name="monitor-{{ m.pk }}" checked="true"/>
-									<label for="send-to-{{ m.pk }}">{{ m }}</label>
+									<input type="checkbox" value="{{ m.pk }}" id="fm-monitor-{{ m.pk }}" name="monitor-{{ m.pk }}" />
+									<label for="fm-monitor-{{ m.pk }}">{{ m }}</label>
 								</div>
 								{% endfor %}
 							</div>
+							
+							<script type="text/javascript">
+								(function() {
+									/* set the 'checked' status of all monitors
+									 * at once, because there are a lot of them */
+									var select_all = function (state) {
+										$$("#send-recipients input").each (function(el) {
+											el.checked = state;
+										});
+									};
+									
+									/* element to hold all/none buttons */
+									var container = $("send-recipients");
+									
+									/* create the SELECT ALL button */
+									new Element ("span", {
+										"html": "Select None",
+										"class": "sel-none",
+										"title": "Select no monitors",
+										"events": {
+											"click": function (ev) {
+												select_all (false); } }
+									}).inject (container, "top");
+									
+									/* ...and the SELECT NONE button */
+									new Element ("span", {
+										"html": "Select All",
+										"class": "sel-all",
+										"title": "Select all monitors",
+										"events": {
+											"click": function (ev) {
+												select_all (true); } }
+									}).inject (container, "top");
+									
+									
+									/* watch all clicks for clicks on monitors */
+									$(document.body).addEvent ("click", function(ev) {
+										var url = "/inventory/monitor/";
+										var el = ev.target;
+										
+										if (el.get("tag") == "a") {
+											if (el.get("href").slice(0, 19) == url) {
+												
+												/* attempt to find a matching monitor checkbox */
+												var pk = parseInt(el.get("href").slice(19, -1));
+												var check = $("fm-monitor-" + pk);
+												
+												if (check) {
+													/* unselect all, except for the
+													 * monitor that we just clicked on */
+													select_all(false);
+													check.checked = true;
+													
+													/* scroll the monitor into view (in
+													 * the little recipients window), and
+													 * briefly flash the background */
+													var div = check.getParent();
+													var pos = div.getPosition(container);
+													container.scrollTo(0, pos.y);
+													div.highlight();
+													
+													/* cancel the usual event */			
+													ev.stop();
+												}
+											}
+										}
+									});
+								})();
+							</script>
 						</td>
 					</tr>
 				</tbody>
