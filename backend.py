@@ -24,7 +24,7 @@ class App(SmsApplication):
 	kw = SmsKeywords()
 	
 	# non-standard regex chunks
-	ALIAS = "([a-z\.]+)"
+	ALIAS = '([a-z\.]+)'
 	
 	
 	def __get(self, model, **kwargs):
@@ -321,7 +321,7 @@ class App(SmsApplication):
 	# <SUPPLY> <PLACE> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
 	kw.prefix = ""
 	
-	@kw("(letters) (letters)(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
+	@kw("(letters)[,\s]*(letters)(?:[,\s]*(\d+))?(?:[,\s]*(\d+))?(?:[,\s]*(\d+))?(?:[,\s]*(\d+))?[\.,]*")
 	def report(self, caller, sup_code, place_code, ben="", qty="", con="", bal=""):
 		
 		# ensure that the caller is known
@@ -426,7 +426,7 @@ class App(SmsApplication):
 	# NO IDEA WHAT THE CALLER WANTS -------------------------------------------
 	
 	def incoming_sms(self, caller, msg):
-		self.log("No keyword match. Attempting to guess...", "warn")
+		self.log("No match by regex", "warn")
 		
 		# we will only attempt to guess if
 		# it looks like the caller is trying
@@ -458,7 +458,7 @@ class App(SmsApplication):
 						
 						# log and dispatch the matching part, as if
 						# it were a regular incoming message
-						self.log("Matched prefix: %r" % (func.func_name), "info")
+						self.log("Prefix matches function: %s" % (func.func_name), "info")
 						self.dispatch_incoming_sms(caller, match.group(0))
 				
 						# drop the part of the message
