@@ -21,7 +21,7 @@ ADMINS = (
 #DATABASE_NAME = root + "/dev.sqlite"
 #DATABASE_ENGINE = "sqlite3"
 DATABASE_ENGINE = 'mysql'
-DATABASE_NAME = 'ethcodes'
+DATABASE_NAME = 'unisms'
 DATABASE_USER = 'unicef'
 DATABASE_PASSWORD = 'm3p3m3p3'
 
