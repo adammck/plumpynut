@@ -1,0 +1,22 @@
+{% if notifications %}
+<div class="notifications module">
+	<table>
+		<caption>{{ caption }}</caption>
+		<thead>
+			<tr>
+				<th scope="column">Monitor</th>
+				<th scope="column">Message</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for n in notifications %}
+			<tr>
+				<td class="monitor"><a href="/inventory/monitor/{{ n.monitor.pk }}/">{{ n.monitor }}</a></td>
+				<td class="msg"><a href="/inventory/notification/{{ n.pk }}/">{{ n.notice }}</a></td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endif %}
+

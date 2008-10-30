@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block object-tools %}
+<ul class="object-tools">
+	<li><a href="export/print/" class="addlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Reference Sheet{% endblocktrans %}</a></li>
+	<li><a href="export/excel/" class="addlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Export to Excel{% endblocktrans %}</a></li>{% if has_add_permission %}
+	<li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name|escape as name %}Add {{ name }}{% endblocktrans %}</a></li>{% endif %}
+</ul>
+{% endblock %}
+

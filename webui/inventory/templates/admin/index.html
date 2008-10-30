@@ -22,7 +22,7 @@
     {% for app in app_list %}
         <div class="module">
         <table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
-        <caption><a href="{{ app.app_url }}" class="section">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a></caption>
+        <caption>{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</caption>
         <tbody>
         {% for model in app.models %}
             <tr>
@@ -33,13 +33,13 @@
             {% endif %}
 
             {% if model.perms.add %}
-                <td><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{ model.admin_url }}add/" class="addlink" title="Add">{% trans 'Add' %}</a></td>
             {% else %}
                 <td>&nbsp;</td>
             {% endif %}
 
             {% if model.perms.change %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+                <td><a href="{{ model.admin_url }}" title="Change" class="changelink">{% trans 'Change' %}</a></td>
             {% else %}
                 <td>&nbsp;</td>
             {% endif %}
@@ -57,12 +57,11 @@
 
 {% block sidebar %}
 <div id="content-related">
+	{% incl_notifications %}
+	
 	<div class="msg-log">
-		<div class="incomming module">
-			{% incl_messages "in" %}
-		</div>
-		<div class="outgoing module">
-			{% incl_messages "out" %}
+		<div class="transactions module">
+			{% incl_transactions %}
 		</div>
 	</div>
 </div>

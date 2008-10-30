@@ -1,17 +1,20 @@
-/* Name and/or Title
+/* Dashboard
  * vim:set noet:
  * --
- * Two or three lines of purpose and/or
- * justification for the existence of this */
+ * Add to the default Django admin styles,
+ * to make the dashboard a little more useful */
 
 
 /* import the default django stylesheet first */
 @import url("/assets/admin/css/dashboard.css");
 
+/* import ie6 hacks and fixes */
+@import url("/assets/css/dashboard-ie6.css");
+
+
 /* make tables full width */
 .dashboard #content,
 .dashboard #content .events { width: auto; }
-/*.dashboard .module { width: 50%; }*/
 
 
 /* make the sidebar considerably wider,
@@ -33,23 +36,89 @@
 	color: #444;
 }
 
-/* allow the logs to wrap, since their
- * contents are important and quite long */
+/* shrink the text in the right column,
+ * because there's a whole lot of data */
 .dashboard #content-related td {
-	white-space: normal;
-	font-size: 10px;
+	font-size: 10px; }
+
+/* hide the captions on the add and change
+ * links, to make more room for data */
+.dashboard #content a.changelink,
+.dashboard #content a.addlink {
+	padding-right: 0;
+	overflow: hidden;
+	width: 0;
 }
+
+
+
+
+/* ---- notifications ---- */
+
+	/* prevent long alerts from blowing up the layout */
+	.dashboard #content-related .notifications td.msg {
+		white-space: normal; }
+
+
+
+
+/* ---- transaction log ---- */
+
+	/* remove padding from cell, since nested
+	 * table has plenty of it's own padding */
+	.dashboard #content-related td.messages {
+		padding: 0; }
+
+	/* make the nested table more succinct than most */
+	.dashboard #content-related td.messages table td {
+		white-space: normal;
+		border: none;
+		padding: 4px;
+	}
+
+	/* incoming/outgoing indicator [raq/laq]uo */
+	.dashboard #content-related td.messages table td.dir {
+		font-weight: bold;
+		width: 1%;
+	}
+
+	/* colorize cells to indicate direction */
+	.dashboard #content-related td.messages table tr.in td.dir  { color: #f00; }
+	.dashboard #content-related td.messages table tr.in { background: #fff8ff; }
+	.dashboard #content-related td.messages tr.out td.dir { color: #0f0; }
+	.dashboard #content-related td.messages tr.out { background: #f8ffff; }
+
+	/* for messages that aren't explicitly linked to a monitor,
+	 * include the destination number off to the right */
+	.dashboard #content-related td.messages table span.to {
+		float: right;
+		color: #aaa
+	}
+
+
+
 
 /* remove the default TH rule, which blows up our fancy
  * events table, and replace it with a more specific rule */
 .dashboard .module table th       { width: auto; }
 .dashboard .module table tbody th { width: 100%; }
 
+/* shrink the monitor and phone
+ * columns as much as possible,
+ * to make space for the messages */
+.dashboard .module table td.monitor,
+.dashboard .module table td.phone {
+	width: 1%;
+}
+
+/* unimportant or unknown information */
+.dashboard .module table td.dull {
+	color: #888; }
+
 /* some column headers have
  * extra help in tooltips */
 .dashboard table th.tip {
-	cursor: help;
-}
+	cursor: help; }
 
 /* space things out a bit more */
 .dashboard .events, .dashboard h1 {

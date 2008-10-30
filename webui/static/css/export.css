@@ -1,0 +1,98 @@
+/* Export Styles
+ * vim:set noet:
+ * --
+ * This is a generic format for
+ * exporting models, to be printed
+ * and given to field monitors */
+
+* {
+	padding: 0;
+	margin: 0;
+}
+
+body {
+	background: #fff;
+	font: 8pt verdana;
+}
+
+/* don't distract the reference
+ * with the link-look, but do
+ * allow the data to be clicked */
+a {
+	text-decoration: none;
+	color: #000;
+}
+
+@media screen {
+	body {
+		padding: 1em;
+	}
+}
+
+h1 {
+	font-size: 16pt;
+	padding-bottom: 0.25em;
+	margin-bottom: 1em;
+	text-align: center;
+	border-bottom: 2px solid #ccc;
+}
+
+h2 {
+	font-size: 13pt;
+	padding-bottom: 0.25em;
+	margin-bottom: 0.25em;
+	border-bottom: 2px solid #eee;
+}
+
+table {
+	border-collapse: collapse;
+	/*page-break-after: always;*/
+	margin-bottom: 4em;
+}
+
+	table caption {
+		background: #eee;
+		margin-bottom: 0.5em;
+		padding: 0.5em;
+		font-weight: bold;
+		font-size: 9pt;
+		white-space: nowrap;
+		border-bottom: 2px solid #ccc;
+	}
+	
+		table caption a {
+			color: #aaa; }
+	
+			table caption a span {
+				color: #000; }
+
+	table td, table th {
+		padding: 0.25em;
+		border: 1px solid #eee;
+	}
+	
+	table td {
+		font-weight: bold;
+	}
+	
+	table th {
+		font-weight: normal;
+		text-align: left;
+	}
+	
+		table th a {
+			text-decoration: none;
+			color: #000;
+		}
+	
+	table td.gap {
+		width: 0.5em;
+		border-top: 0;
+		border-bottom: 0;
+		padding: 0;
+	}
+	
+	table .empty {
+		border: 0;
+	}
+

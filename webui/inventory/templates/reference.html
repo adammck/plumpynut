@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+	<head>
+		<title>All OTPs</title>
+		<link rel="stylesheet" href="/assets/css/export.css" />
+	</head>
+	<body>
+		{% for region in regions %}
+		<h1><a href="/inventory/region/{{ region.pk }}">{{ region.name }} Region</a></h1>
+		<div class="region">
+			{% for zone in region.zones %}
+			<h2><a href="/inventory/zone/{{ zone.pk }}/">{{ zone.name }} Zone</a></h2>
+			<div class="zone">
+				{% for area in zone.areas %}{% if area.locations %}
+				<table>
+					<caption><a href="/inventory/area/{{ area.pk }}/"><span>{{ area.name }} Woreda</span> (<span>{{ area.code }}</span>)</a></caption>
+					<tbody>
+						{% for location in area.locations %}
+						{% if location.left %}<tr>{% endif %}
+							{% if location.right %}<td class="gap"></td>{% endif %}
+							<th class="{% if location.left %}L{% else %}R{% endif %}"><a href="/inventory/location/{{ location.pk }}/">{{ location.name }}</a></th>
+							<td class="{% if location.left %}L{% else %}R{% endif %}">{{ location.code }}</td>
+						{% if location.right %}</tr>{% else %}
+						{% if forloop.last %}<td class="gap empty"></td><th class="R empty"></th><td class="R empty"></td>{% endif %}
+						{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>
+				{% endif %}{% endfor %}
+			</div>
+			{% endfor %}
+		</div>
+		{% endfor %}
+	</body>	
+</html>
+

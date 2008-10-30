@@ -80,7 +80,9 @@ class App(SmsApplication):
 		
 		# something went wrong (probably
 		# missing the Levenshtein library)
-		except: return None
+		except:
+			self.log("Couldn't import Levenshtein library", "err")
+			return None
 		
 		# searches are case insensitive
 		string = string.upper()
@@ -107,7 +109,18 @@ class App(SmsApplication):
 		
 		# nothing was close enough
 		else: return None
+	
+	
+	def new_transaction(self, caller):
+		id = random.randint(11111111, 99999999)
 		
+		# when a new transaction is started, create an
+		# instance to bind the messages sent and received
+		mon = self.__get(Monitor, phone=caller)
+		return Transaction.objects.create(
+			identity=id,
+			phone=caller,
+			monitor=mon)
 	
 	
 	
@@ -214,7 +227,7 @@ class App(SmsApplication):
 				.order_by('-time')[0]
 			
 			# delete it and notify
-			entry.delete()
+			latest.delete()
 			self.respond(STR["cancel_ok"])
 		
 		except (ObjectDoesNotExist, IndexError):
@@ -268,6 +281,14 @@ class App(SmsApplication):
 	def help_report(self, caller):
 		self.respond(STR["help_report"])
 	
+	@kw("register", "identify")
+	def help_report(self, caller):
+		self.respond(STR["help_reg"])
+	
+	@kw("alert")
+	def help_report(self, caller):
+		self.respond(STR["help_alert"])
+	
 	@kw.invalid()
 	def help_help(self, caller):
 		self.respond(STR["help_help"])
@@ -275,11 +296,11 @@ class App(SmsApplication):
 	
 	
 	
-	# <SUPPLY> <LOCATION> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
+	# <SUPPLY> <PLACE> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
 	kw.prefix = ""
 	
 	@kw("(letters) (letters)(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
-	def report(self, caller, sup_code, loc_code, ben="", qty="", con="", bal=""):
+	def report(self, caller, sup_code, place_code, ben="", qty="", con="", bal=""):
 		
 		# ensure that the caller is known
 		monitor = self.__identify(caller, "reporting")
@@ -309,40 +330,54 @@ class App(SmsApplication):
 			% ("supply code", scu))
 		
 		
-		# ...and the location
-		lcu = loc_code.upper()
-		loc = self.__get(Location, code=lcu)
-		if loc is None:
+		# init variables to avoid
+		# pythonic complaints
+		loc = None
+		area = None
+		pcu = place_code.upper()
 		
-			# invalid location code, so
-			# search for a close match
-			all_loc = Location.objects.all()
-			sug = self.__guess(lcu, all_loc)
-			if sug is not None:
-				str, obj, dist = sug
+		
+		# ...and the "place", which could
+		# be either a location or area
+		loc = self.__get(Location, code=pcu)
+		if loc is None:
 			
-				# found a close match, so
-				# error with a suggestion
-				if dist < 5:
-					raise CallerError(STR["suggest"]\
-					% ("location code", lcu, obj.code, obj.name))
+			# not a valid location, so try area
+			area = self.__get(Area, code=pcu)
+			if area is None:
+				
+				# the code was neither a location
+				# no area, so search for a close match
+				sug = self.__guess(pcu,
+					list(Location.objects.all()) +
+					list(Area.objects.all()))
+				
+				if sug is not None:
+					str, obj, dist = sug
+				
+					# found a close match, so
+					# error with a suggestion
+					if dist < 5:
+						raise CallerError(STR["suggest"]\
+						% ("OTP or Woreda code", pcu, obj.code, obj.name))
 			
-			# no close matches (or spellcheck isn't
-			# working), so just return error
-			raise CallerError(STR["unknown"]\
-			% ("location code", lcu))
+				# no close matches (or spellcheck isn't
+				# working), so just return error
+				raise CallerError(STR["unknown"]\
+				% ("OTP or Woreda code", pcu))
 		
 		
 		# fetch the supplylocation object, to update the current stock
 		# levels. if it doesn't already exist, just create it, because
 		# the administrators probably won't want to add them all...
-		sl, created = SupplyLocation.objects.get_or_create(supply=sup, location=loc)
+		
+		sp, created = SupplyPlace.objects.get_or_create(supply=sup, location=loc, area=area)
 		
 		# create the entry object, with
 		# no proper validation (todo!)
 		Entry.objects.create(
 			monitor=monitor,
-			supply_location=sl,
+			supply_place=sp,
 			beneficiaries=ben,
 			quantity=qty,
 			consumption=con,
@@ -359,8 +394,8 @@ class App(SmsApplication):
 		# notify the caller of their new entry
 		# this doesn't seem to be localizable
 		self.respond(
-			"Received %s report for %s by %s.\n%s\nIf this is not correct, reply with CANCEL" %\
-			(sup.name, loc.name, monitor, ", ".join(info)))
+			"Received %s report for %s %s by %s: %s.\nIf this is not correct, reply with CANCEL" %\
+			(sup.name, sp.type, sp.place, monitor, ", ".join(info)))
 
 
 	
@@ -379,26 +414,46 @@ class App(SmsApplication):
 	# without interfereing with dispatch
 	def before_incoming(self, caller, msg):
 		
-		# fetch the caller's identity, and log.	we must
-		# log the phone number as well as the monitor
-		# object, because they can (and will) change
-		rep = self.__get(Monitor, phone=caller)
+		# we will log the monitor, if we can identify
+		# them by their number. otherwise, log the number
+		mon = self.__get(Monitor, phone=caller)
+		if mon is None: ph = caller
+		else: ph = None
+		
+		# don't log if the details are the
+		# same as the transaction itself
+		if mon == self.transaction.monitor: mon = None
+		if ph  == self.transaction.phone:   ph  = None
+		
+		# create a new log entry
 		Message.objects.create(
 			transaction=self.transaction,
 			is_outgoing=False,
-			monitor=rep,
 			phone=caller,
+			monitor=mon,
 			message=msg)
 	
 	
 	# as above...
 	def before_outgoing(self, recipient, msg):
-		rep = self.__get(Monitor, phone=recipient)
+		
+		# we will log the monitor, if we can identify
+		# them by their number. otherwise, log the number
+		mon = self.__get(Monitor, phone=recipient)
+		if mon is None: ph = recipient
+		else: ph = None
+		
+		# don't log if the details are the
+		# same as the transaction itself
+		if mon == self.transaction.monitor: mon = None
+		if ph  == self.transaction.phone:   ph  = None
+		
+		# create a new log entry
 		Message.objects.create(
 			transaction=self.transaction,
 			is_outgoing=True,
-			monitor=rep,
 			phone=recipient,
+			monitor=mon,
 			message=msg)
 
 
