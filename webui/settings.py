@@ -18,12 +18,16 @@ ADMINS = (
 
 
 # database settings
-#DATABASE_NAME = root + "/dev.sqlite"
-#DATABASE_ENGINE = "sqlite3"
-DATABASE_ENGINE   = "mysql"
-DATABASE_NAME     = "unisms"
-DATABASE_USER     = "unicef"
-DATABASE_PASSWORD = "mepemepe"
+DATABASE_ENGINE = 'mysql'
+DATABASE_NAME   = 'unisms'
+DATABASE_USER   = 'unicef'
+
+# yes, here is the password to the development
+# machine that we're currently running unisms
+# on - in a public git repo, no less!
+DATABASE_PASSWORD = 'mepemepe'
+
+
 
 
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

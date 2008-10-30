@@ -16,6 +16,9 @@ urlpatterns = patterns("",
 	(r'^(?P<app_label>.+?)/(?P<model_name>.+?)/export/excel/$', ex_views.to_excel),
 	(r'^(?P<app_label>.+?)/(?P<model_name>.+?)/export/print/$', in_views.to_print),
      
+    # send sms
+    	(r'^send_sms/$', 'inventory.views.send_sms'),
+
     # redirect everything else to admin
     (r'^(.*)', admin.site.root),
 )

@@ -29,6 +29,12 @@ def incl_messages(type):
 	}
 
 
+@register.inclusion_tag("send.html")
+def incl_send():
+	return {
+		"monitors": Monitor.objects.all()
+	}
+
 @register.inclusion_tag("transactions.html")
 def incl_transactions():
 	return {

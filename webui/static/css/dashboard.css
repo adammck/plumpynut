@@ -53,6 +53,32 @@
 
 
 
+/* ---- broadcast a message ---- */
+
+	.dashboard #content .send table {
+		border-right: none;
+		width: 100%;
+	}
+	
+	.dashboard #content .send fieldset {
+		padding: 0;
+		border: 0;
+	}
+	
+	.dashboard #content .send td.form {
+		width: 1%; }
+	
+		.dashboard #content .send td.form textarea {
+			width: 20em;
+			height: 5em;
+		}
+	
+	.dashboard #content .send .recipients {
+		overflow-y: scroll;
+		height: 10em;
+	}
+
+
 /* ---- notifications ---- */
 
 	/* prevent long alerts from blowing up the layout */

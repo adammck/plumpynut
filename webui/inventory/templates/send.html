@@ -1,0 +1,32 @@
+<div class="send module">
+	<form action="/send_sms/" method="post">
+		<fieldset>
+						
+			<table>
+				<caption>Broadcast Message</caption>
+				<tbody>
+					<tr>
+						<td class="form">
+							<div class="textarea"><div>
+							<!-- wrapped for nice graphical borders -->
+							<textarea name="sms_text" id="send-sms-text"></textarea>
+							</div></div>
+	
+							<input type="submit" value="Send" />
+						</td>
+						<td>
+							<div class="recipients">
+								{% for m in monitors %}
+								<div>
+									<input type="checkbox" value="{{ m.pk }}" id="send-to-{{ m.pk }}" name="monitor-{{ m.pk }}" checked="true"/>
+									<label for="send-to-{{ m.pk }}">{{ m }}</label>
+								</div>
+								{% endfor %}
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+	</form>
+</div>

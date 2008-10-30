@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# vim: noet
+
+import kannel
+from smsapp import *
+#from strings import ENGLISH as STR
+
 import csv, sys
 from random import choice 
 from string import * 
@@ -10,6 +17,50 @@ from django.core.management import setup_environ
 from webui import settings 
 setup_environ(settings)
 from webui.inventory.models import * 
+
+def blast(monitors, message, field=None):
+	
+	# mass SMS blaster to send a message to a
+	# list of monitors. Messages to uniSMS Monitors
+	# can be personalized by including either 
+	# %(alias)s or %(first_name)s or %(last_name)s or
+	# %(__unicode)s in the message and passing the
+	# optional field parameter of either alias or
+	# first_name or last_name or __unicode__
+	# TODO allow multiple personalized strings
+	
+	sending = 0 
+	sender = kannel.SmsSender("user", "password")
+	for m in monitors:
+		number = m.phone
+		# passing a field implies that
+		# the message includes
+		# personalizeable strings
+		if field:
+
+			# if a field is given, try to
+			# substitute the monitor's attribute
+			# for the personalized string
+			# and send the personalized message
+			if hasattr(m, field):
+				attribute = getattr(m,field)
+				pmessage = message % {field : attribute}
+               			sender.send(number, pmessage)
+				sending += 1
+				print 'Blasted to %d of %d recipients... %s' % (sending, len(monitors), m.details)
+			else:
+				print "Oops. Monitors don't have %s" % (field)
+
+		# if a field is not given, blast the
+		# message directly to all given monitors
+		else:
+			sender.send(number, message)
+			sending += 1
+			print 'Blasted to %d of %d monitors...' % (sending, len(monitors))
+
+        return "Blasted... '%s' ...to %d monitors with %d failures" % (message, sending, (len(monitors) - sending))
+	
+
 
 def import_places():
     filename = file('SNNPR-Table1.csv')
