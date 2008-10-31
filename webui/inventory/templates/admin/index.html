@@ -3,7 +3,7 @@
 {% load includes %}
 
 {% block stylesheet %}/assets/css/dashboard.css{% endblock %}
-
+{% block extrahead %}<script type="text/javascript" src="/assets/js/mootools-1.2-core-yc.js"></script>{% endblock %}
 {% block coltype %}colMS{% endblock %}
 
 {% block bodyclass %}dashboard{% endblock %}
@@ -12,9 +12,6 @@
 <div id="content-main">
 <div class="module events">
 	{% incl_grid %}
-</div>
-<div class="module send">
-	{% incl_send %}
 </div>
 
 
@@ -59,6 +56,10 @@
 <div id="content-related">
 	{% incl_notifications %}
 	
+	<div class="module send">
+		{% incl_send %}
+	</div>
+
 	<div class="msg-log">
 		<div class="transactions module">
 			{% incl_transactions %}
