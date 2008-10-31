@@ -77,10 +77,13 @@
 			height: 5em;
 		}
 		
+		/* make the all+none buttons look like
+		 * regular django submit buttons */
 		.dashboard #content .send .sel-all,
 		.dashboard #content .send .sel-none {
 			display: block;
-			background: #eee;
+			background: #eee url("/assets/admin/img/admin/nav-bg.gif") repeat-x 0 50%;
+			border-bottom: 1px solid #aaa;
 			cursor: pointer;
 			width: 50%;
 			float: left;
@@ -88,10 +91,12 @@
 			padding: 2px 0;
 			text-align: center;
 		}
-		
-			.dashboard #content .send .sel-all:hover,
-			.dashboard #content .send .sel-none:hover {
-				background: #ddd; }
+			
+			/* split them with a tiny gap */
+			.dashboard #content .send .sel-none {
+				border-left: 1px solid #fff;
+				margin-left: -1px;
+			}
 		
 		.dashboard #content .send div {
 			clear: both; }
@@ -102,7 +107,7 @@
 	.dashboard #content .send #send-recipients {
 		padding-right: 5px;
 		overflow-y: scroll;
-		height: 12em;
+		height: 9em;
 	}
 
 
