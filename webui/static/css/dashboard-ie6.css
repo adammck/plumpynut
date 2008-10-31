@@ -21,3 +21,12 @@
 	width: 460px;
 	float: right;
 }
+
+/* the all/none buttons seem to get blown
+ * apart in ie6. the combined width, 100%,
+ * doesn't take into account the padding
+ * of the parent element */
+* html .dashboard #content .send .sel-all,
+* html .dashboard #content .send .sel-none {
+	width: 46%; }
+
