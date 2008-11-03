@@ -12,7 +12,7 @@ class EntryInline(admin.TabularInline):
 
 class MonitorAdmin(admin.ModelAdmin):
 	form = MonitorForm
-	list_display = ('__unicode__', 'alias', 'phone', 'email', 'latest_report')
+	list_display = ('__unicode__', 'alias', 'phone', 'email', 'latest_report', 'incoming_messages')
 	search_fields = ('__unicode__', 'alias')
 
 class EntryAdmin(admin.ModelAdmin):
