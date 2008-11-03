@@ -321,7 +321,7 @@ class App(SmsApplication):
 	# <SUPPLY> <PLACE> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
 	kw.prefix = ""
 	
-	@kw("[\"'\s]*(letters)[,\.\s]*(letters)(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?[\.,\"']*")
+	@kw("[\"'\s]*(letters)[,\.\s]*(letters)[,\.\s]*(\d+)(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?[\.,\"']*")
 	def report(self, caller, sup_code, place_code, ben="", qty="", con="", bal=""):
 		
 		# ensure that the caller is known
