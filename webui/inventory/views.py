@@ -65,3 +65,7 @@ def to_print(request, app_label, model_name):
 	
 	return render_to_response("reference.html", {"regions": data})
 
+
+def map_entries(request):
+	return render_to_response("map/entries.html")
+

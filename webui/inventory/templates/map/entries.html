@@ -1,0 +1,28 @@
+{% extends "admin/base_site.html" %}
+{% block extrahead %}<script type="text/javascript" src="/assets/js/mootools-1.2-core-yc.js"></script>{% endblock %}
+{% block title %}Entries as a Map{% endblock %}
+
+{% block content %}
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAg-8XYORS7v1h_9zDQNMVAhSVA0KX3RHSzNnk6nT8C9kt2staMxR_mIYMiXdrlrK5Te4_By9-iZF1mQ" type="text/javascript"></script>
+<div id="map" style="width: 100%; height: 500px;"></div>
+
+<script type="text/javascript">
+	var UNICEF = new GLatLng(37.0625, -95.677068);
+	
+	//$(document.body).addEvent ("load", function() {
+		if (GBrowserIsCompatible()) {
+			var map = new GMap2($("map"));
+			map.setCenter(UNICEF, 10);
+			
+			// switch to hybrid mode
+			map.setMapType(map.getMapTypes()[2])
+			
+			// behave similar to maps.google.com
+			map.enableScrollWheelZoom()
+		}
+	//});
+	
+	// garbage collection for dumb browsers
+	$(document.body).addEvent("unload", GUnload);
+</script>
+{% endblock %}
