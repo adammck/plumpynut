@@ -223,7 +223,8 @@ class App(SmsApplication):
 			# entry with this code
 			entry = Entry.objects.filter(
 				monitor=monitor,\
-				supply_place__location__code=code)
+				supply_place__location__code=code)\
+				.order_by('-time')[0]
 
 			# delete it and notify
 			entry.delete()
@@ -234,7 +235,8 @@ class App(SmsApplication):
 				# try again for woreda code
 				entry = Entry.objects.filter(
 					monitor=monitor,\
-					supply_place__area__code=code)
+					supply_place__area__code=code)\
+					.order_by('-time')[0]
 
 				# delete it and notify
 				entry.delete()
@@ -424,10 +426,14 @@ class App(SmsApplication):
 		
 		# notify the caller of their new entry
 		# this doesn't seem to be localizable
-		self.respond(
-			"Received %s report for %s %s by %s: %s.\nIf this is not correct, reply with CANCEL" %\
-			(sup.name, sp.type, sp.place, monitor, ", ".join(info)))
-
+		if loc is None:
+			self.respond(
+				"Received %s report for %s %s by %s: %s.\nIf this is not correct, reply with CANCEL %s" %\
+				(sup.name, sp.type, sp.place, monitor, ", ".join(info), area))
+		if area is None:
+			self.respond(
+				"Received %s report for %s %s by %s: %s.\nIf this is not correct, reply with CANCEL %s" %\
+				(sup.name, sp.type, sp.place, monitor, ", ".join(info), loc))
 
 	
 	
