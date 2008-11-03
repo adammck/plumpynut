@@ -1,8 +1,7 @@
-This Week's Entries:
 <img src="http://chart.apis.google.com/chart?
-chs=200x100
+chs=400x100
 &amp;cht=lc
 &amp;chd=t:{% for c in counts %}{{ c }}{% if forloop.last %}.0{% else %}.0,{% endif %}{% endfor %}
 &amp;chxt=x,y
 &amp;chxl=
-0:|{% for d in days %}{{ d }}|{% endfor %}" />
+0:|{% for d in dates %}{{ d }}|{% endfor %}" />

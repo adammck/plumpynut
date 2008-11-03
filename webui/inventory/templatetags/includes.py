@@ -9,21 +9,31 @@ register = template.Library()
 
 @register.inclusion_tag("graph.html")
 def incl_graph():
-	d = timedelta(days=1)
 	today = datetime.today().date()
+
+	# step for x axis
+	step = timedelta(days=1)
+
+	# empties to fill up with data
 	counts = []
-	days = []
-	entries = Entry.objects.all()
-	for r in range(7):
+	dates = []
+
+	# only get last two weeks of entries 
+	day_range = timedelta(days=14)
+	entries = Entry.objects.filter(
+			time__gt=(today	- day_range))
+	
+	# count entries per day
+	for day in range(14):
 		count = 0
-		t = today-(d * r)
+		d = today - (step * day)
 		for e in entries:
-			if e.time.day == t.day:
+			if e.time.day == d.day:
 				count += 1
-		days.append(t.day)
+		dates.append(d.day)
 		counts.append(count)
 
-	return { "counts" : counts, "days" : days } 
+	return { "counts" : counts, "dates" : dates } 
 
 @register.inclusion_tag("grid.html")
 def incl_grid():
