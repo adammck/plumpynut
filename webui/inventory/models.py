@@ -6,6 +6,7 @@ from django.contrib.auth import models as auth_models
 from django.core.exceptions import ObjectDoesNotExist 
 from webui.utils import otp_code, woreda_code 
 
+
 class Monitor(models.Model):
 	first_name = models.CharField(max_length=50)
 	last_name = models.CharField(max_length=50)
@@ -41,6 +42,7 @@ class Monitor(models.Model):
 		return "%s (%s)" % (self, ph)
 	details = property(_get_details)
 
+
 class Supply(models.Model):
 	name = models.CharField(max_length=100, unique=True)
 	code = models.CharField(max_length=20, unique=True)
@@ -60,6 +62,7 @@ class Supply(models.Model):
 
 	number_of_reports = property(_get_number_of_reports)
 
+
 class Region(models.Model):
 	name = models.CharField(max_length=100, unique=True, help_text="Name of region")
 
@@ -70,6 +73,7 @@ class Region(models.Model):
 		return len(Zone.objects.filter(region=self.id))
 
 	number_of_zones = property(_get_number_of_zones)
+
 
 class Zone(models.Model):
 	name = models.CharField(max_length=100, unique=True, help_text="Name of zone")
@@ -85,6 +89,7 @@ class Zone(models.Model):
 		return len(Area.objects.filter(zone=self.id))
 
 	number_of_woredas = property(_get_number_of_areas)
+
 
 class Area(models.Model):
 	name = models.CharField(max_length=100, unique=True, help_text="Full name of woreda")
@@ -112,10 +117,17 @@ class Area(models.Model):
 	
 	number_of_OTPs = property(_get_number_of_locations)
 
+
+class GeoPoint(models.Model):
+	latitude = models.DecimalField(max_digits=8, decimal_places=6)
+	longitude = models.DecimalField(max_digits=8, decimal_places=6)
+	
+
 class Location(models.Model):
 	name = models.CharField(max_length=100, help_text="Full name of the OTP")
 	code = models.CharField(max_length=20, unique=True, editable=False)
 	area = models.ForeignKey(Area, help_text="Name of woreda")
+	point = models.ForeignKey(GeoPoint, null=True, blank=True, help_text="The physical location of this OTP")
 	
 	def save(self):
 		# if this OTP does not already
@@ -137,6 +149,7 @@ class Location(models.Model):
     		return self.area
 
 	woreda = property(_get_woreda)
+
 
 class SupplyPlace(models.Model):
 	supply = models.ForeignKey(Supply) 
@@ -169,6 +182,7 @@ class SupplyPlace(models.Model):
 		else:             return "Unknown"
 	woreda = property(_get_area)
 
+
 class Notification(models.Model):
 	monitor = models.ForeignKey(Monitor)
 	time = models.DateTimeField(auto_now_add=True)
@@ -178,6 +192,7 @@ class Notification(models.Model):
 	def __unicode__(self):
 		return "%s by %s" %\
 		(self.time.strftime("%d/%m/%y"), self.monitor)
+
 
 class Report(models.Model):
 	supply = models.ForeignKey(Supply)
@@ -200,7 +215,7 @@ class Report(models.Model):
 
 	number_of_entries = property(_get_number_of_entries)
 	latest_entry = property(_get_latest_entry)
-
+	
 
 class Entry(models.Model):
 	monitor = models.ForeignKey(Monitor, help_text="Field monitor")
