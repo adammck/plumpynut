@@ -406,15 +406,23 @@ class App(SmsApplication):
 		
 		sp, created = SupplyPlace.objects.get_or_create(supply=sup, location=loc, area=area)
 		
-		# create the entry object, with
-		# no proper validation (todo!)
-		Entry.objects.create(
-			monitor=monitor,
-			supply_place=sp,
-			beneficiaries=ben,
-			quantity=qty,
-			consumption=con,
-			balance=bal)
+		# create the entry object, 
+		# unless its a recent duplicate 
+		try:
+			Entry.objects.filter(
+				monitor=monitor,
+				supply_place=sp,
+				time__gt=date.today())\
+				.order_by('-time')[0]
+
+		except (ObjectDoesNotExist, IndexError):
+			Entry.objects.create(
+				monitor=monitor,
+				supply_place=sp,
+				beneficiaries=ben,
+				quantity=qty,
+				consumption=con,
+				balance=bal)
 		
 		# collate all of the information submitted, to
 		# be sent back and checked by the caller
