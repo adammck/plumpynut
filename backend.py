@@ -214,6 +214,36 @@ class App(SmsApplication):
 	# CANCEL ------------------------------------------------------------------
 	kw.prefix = "cancel"
 
+	@kw("(letters)")
+	def cancel_code(self, caller, code):
+		monitor = self.__identify(caller, "cancelling")
+
+		try:
+			# attempt to find monitor's 
+			# entry with this code
+			entry = Entry.objects.filter(
+				monitor=monitor,\
+				supply_place__location__code=code)
+
+			# delete it and notify
+			entry.delete()
+			self.respond(STR["cancel_code_ok"] % (code))
+
+		except (ObjectDoesNotExist, IndexError):
+			try:
+				# try again for woreda code
+				entry = Entry.objects.filter(
+					monitor=monitor,\
+					supply_place__area__code=code)
+
+				# delete it and notify
+				entry.delete()
+				self.respond(STR["cancel_code_ok"] % (code))
+
+			except (ObjectDoesNotExist, IndexError):
+				raise CallerError(STR["cancel_none"])
+
+
 	@kw.blank()
 	def cancel(self, caller):
 		monitor = self.__identify(caller, "cancelling")
@@ -232,7 +262,8 @@ class App(SmsApplication):
 		
 		except (ObjectDoesNotExist, IndexError):
 			raise CallerError(STR["cancel_none"])
-	
+
+
 	@kw.invalid()
 	def cancel_help(self, caller, *msg):
 		raise CallerError(STR["cancel_help"])

@@ -21,6 +21,7 @@ ENGLISH = {
 	"alert_ok":       "Thank you. Your alert was received and sent to UNICEF",
 	"alert_help":     SORRY + "Please tell me what you are alerting, by replying: ALERT <NOTICE>",
 	"cancel_ok":      "Your last report has been deleted",	
+	"cancel_code_ok":      "Your last report for %s has been deleted",	
 	"cancel_none":    "You have not submitted any reports today. If you wish to change an older entry, please call " + SUPPORT,
 	"cancel_help":    SORRY + "You may delete your last report by replying: CANCEL",
 	"supplies_help":  SORRY + "To list all supply codes, please reply: SUPPLIES",
