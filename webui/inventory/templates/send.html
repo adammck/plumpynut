@@ -37,18 +37,6 @@
 									var container = $("send-recipients");
 									var txta = $$("#send-form textarea")[0];
 									
-									/* create the SELECT ALL button */
-									new Element ("span", {
-										"html": "Select None",
-										"class": "sel-none",
-										"title": "Select no monitors",
-										"events": {
-											"click": function (ev) {
-												select_all (false);
-												txta.focus();
-										}}
-									}).inject (container, "before");
-									
 									/* ...and the SELECT NONE button */
 									new Element ("span", {
 										"html": "Select All",
@@ -57,6 +45,18 @@
 										"events": {
 											"click": function (ev) {
 												select_all (true);
+												txta.focus();
+										}}
+									}).inject (container, "before");
+									
+									/* create the SELECT ALL button */
+									new Element ("span", {
+										"html": "Select None",
+										"class": "sel-none",
+										"title": "Select no monitors",
+										"events": {
+											"click": function (ev) {
+												select_all (false);
 												txta.focus();
 										}}
 									}).inject (container, "before");
