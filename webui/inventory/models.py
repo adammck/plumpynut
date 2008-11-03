@@ -13,6 +13,7 @@ class Monitor(models.Model):
 	alias = models.CharField(max_length=16, unique=True, help_text="Abbreviated name, lowercase letters")
 	phone = models.CharField(max_length=30, blank=True, help_text="e.g., +251912555555")
 	email = models.EmailField(blank=True)
+	incoming_messages = models.PositiveIntegerField(help_text="The number of messages that uniSMS has received from this Monitor")
 	
 	class Meta:
 		verbose_name = "Field Monitor"

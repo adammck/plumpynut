@@ -116,9 +116,15 @@ class App(SmsApplication):
 	def new_transaction(self, caller):
 		id = random.randint(11111111, 99999999)
 		
+		# fetch the monitor, and increment their incoming
+		# message counter (so they can be payed for the sms)
+		mon = self.__get(Monitor, phone=caller)
+		if mon is not None:
+			mon.incoming_messages += 1
+			mon.save()
+		
 		# when a new transaction is started, create an
 		# instance to bind the messages sent and received
-		mon = self.__get(Monitor, phone=caller)
 		return Transaction.objects.create(
 			identity=id,
 			phone=caller,
