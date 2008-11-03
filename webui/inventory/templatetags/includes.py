@@ -1,11 +1,29 @@
 #!/usr/bin/env python
 # vim: noet
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from inventory.models import *
 from django import template
 register = template.Library()
+
+@register.inclusion_tag("graph.html")
+def incl_graph():
+	d = timedelta(days=1)
+	today = datetime.today().date()
+	counts = []
+	days = []
+	entries = Entry.objects.all()
+	for r in range(7):
+		count = 0
+		t = today-(d * r)
+		for e in entries:
+			if e.time.day == t.day:
+				count += 1
+		days.append(t.day)
+		counts.append(count)
+
+	return { "counts" : counts, "days" : days } 
 
 @register.inclusion_tag("grid.html")
 def incl_grid():
