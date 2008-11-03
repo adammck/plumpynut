@@ -34,7 +34,7 @@
 									};
 									
 									/* element to hold all/none buttons */
-									var container = $("send-recipients").getParent();
+									var container = $("send-recipients");
 									var txta = $$("#send-form textarea")[0];
 									
 									/* create the SELECT ALL button */
@@ -47,7 +47,7 @@
 												select_all (false);
 												txta.focus();
 										}}
-									}).inject (container, "top");
+									}).inject (container, "before");
 									
 									/* ...and the SELECT NONE button */
 									new Element ("span", {
@@ -59,7 +59,7 @@
 												select_all (true);
 												txta.focus();
 										}}
-									}).inject (container, "top");
+									}).inject (container, "before");
 									
 									
 									/* keep track of the last monitor
