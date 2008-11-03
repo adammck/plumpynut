@@ -301,7 +301,7 @@ class App(SmsApplication):
 	# <SUPPLY> <PLACE> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
 	kw.prefix = ""
 	
-	@kw("[\"'\s]*(letters)[,\s]*(letters)(?:[,\s]*(\d+))?(?:[,\s]*(\d+))?(?:[,\s]*(\d+))?(?:[,\s]*(\d+))?[\.,\"']*")
+	@kw("[\"'\s]*(letters)[,\.\s]*(letters)(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?[\.,\"']*")
 	def report(self, caller, sup_code, place_code, ben="", qty="", con="", bal=""):
 		
 		# ensure that the caller is known
@@ -372,7 +372,6 @@ class App(SmsApplication):
 		# fetch the supplylocation object, to update the current stock
 		# levels. if it doesn't already exist, just create it, because
 		# the administrators probably won't want to add them all...
-		
 		sp, created = SupplyPlace.objects.get_or_create(supply=sup, location=loc, area=area)
 		
 		# create the entry object, with
