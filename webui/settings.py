@@ -25,7 +25,7 @@ DATABASE_USER   = 'unicef'
 # yes, here is the password to the development
 # machine that we're currently running unisms
 # on - in a public git repo, no less!
-DATABASE_PASSWORD = 'mepemepe'
+DATABASE_PASSWORD = 'm3p3m3p3'
 
 
 
