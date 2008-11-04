@@ -220,7 +220,7 @@ class App(SmsApplication):
 
 
 	# CANCEL ------------------------------------------------------------------
-	kw.prefix = "cancel"
+	kw.prefix = ["cancel", "cancle"]
 
 	@kw.blank()
 	def cancel(self, caller):
