@@ -16,9 +16,6 @@ class MonitorAdmin(admin.ModelAdmin):
 	search_fields = ('first_name', 'last_name', 'alias')
 	inlines = [EntryInline]
 
-
-
-
 class EntryAdmin(admin.ModelAdmin):
 	list_display = ('supply_place', 'time', 'monitor')
 	list_filter = ['time']
@@ -26,10 +23,8 @@ class EntryAdmin(admin.ModelAdmin):
 	ordering = ['time']	
 	search_fields = ('supply_place__location__name', 'supply_place__area__name', 'monitor__first_name', 'monitor__last_name', 'monitor__alias')
 
-
 class LocationInline(admin.TabularInline):
 	model = Location
-
 
 class AreaInline(admin.TabularInline):
 	model = Area
@@ -75,12 +70,10 @@ class ReportAdmin(admin.ModelAdmin):
 class SupplyAdmin(admin.ModelAdmin):
 	form = SupplyForm
 	list_display = ('name', 'code', 'number_of_reports')
-	#inlines = [ReportInline,]
 
 class SupplyPlaceAdmin(admin.ModelAdmin):
 	list_display = ('location', 'supply', 'quantity', 'woreda')
 	radio_fields = {'supply' : admin.HORIZONTAL}
-	#inlines = [EntryInline,]
 
 
 # add our models to the django admin

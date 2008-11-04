@@ -7,15 +7,29 @@ from inventory.models import *
 from webui.utils import * 
 
 def send_sms(request):
-	if request.method != 'POST':
-        	raise Http404()
-	sms_text = request.POST['sms_text'].replace('\r', '')
-	recipients = []
-    	for m in Monitor.objects.all():
-		if request.POST.has_key("monitor-" + str(m.pk)):
-			recipients.append(get_object_or_404(Monitor, pk=request.POST["monitor-" + str(m.pk)]))
 	
-	return HttpResponse(blast(recipients, sms_text), mimetype="text/plain")
+	# there is no view, only post requests
+	# from the form on the dashboard
+	if request.method != 'POST':
+		raise Http404()
+
+	# remove line feeds (todo: the sending backend
+	# should deal with this automatically)
+	sms_text = request.POST['message'].replace('\r', '')
+
+	# iterate all monitors, and if they're in the
+	# POST form (ie, their checkbox was ticked),
+	# add them to the recipients array
+	recipients = []
+	for m in Monitor.objects.all():
+		if request.POST.has_key("monitor-" + str(m.pk)):
+			recipients.append(m)
+
+	# perform the "blast" and dump the output
+	# (short summary of what was sent, and what
+	# failed) in a very bland and temporary page
+	result = blast(recipients, sms_text)
+	return HttpResponse(result, mimetype="text/plain")
 
 
 def to_print(request, app_label, model_name):
@@ -53,6 +67,7 @@ def to_print(request, app_label, model_name):
 		data.append(region)
 	
 	return render_to_response("reference.html", {"regions": data})
+
 
 def graph_entries(num_days=14):
 	# its a beautiful day
@@ -161,3 +176,8 @@ def graph_avg_places_stat():
 		
 	return {"o_b" : o_b, "o_q" : o_q, "o_c" : o_c, "o_s" : o_s,\
 		"w_b" : w_b, "w_q" : w_q, "w_c" : w_c, "w_s" : w_s} 
+
+
+def map_entries(request):
+	return render_to_response("map/entries.html")
+

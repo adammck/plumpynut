@@ -17,7 +17,10 @@ urlpatterns = patterns("",
 	(r'^(?P<app_label>.+?)/(?P<model_name>.+?)/export/print/$', in_views.to_print),
      
     # send sms
-    	(r'^send_sms/$', 'inventory.views.send_sms'),
+	(r'^send_sms/$', 'inventory.views.send_sms'),
+	
+	# various google maps
+	(r'^map/entries/$', in_views.map_entries),
 
     # redirect everything else to admin
     (r'^(.*)', admin.site.root),

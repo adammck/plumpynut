@@ -53,6 +53,64 @@
 
 
 
+/* ---- broadcast a message ---- */
+
+	.dashboard #content .send table {
+		border-right: none;
+		width: 100%;
+	}
+	
+	/* remove django admin style */
+	.dashboard #content .send fieldset {
+		padding: 0;
+		border: 0;
+	}
+	
+	/* tightly pack the form cell (we
+	 * don't know how big the widgets
+	 * will be, since they're native) */
+	.dashboard #content .send td.form {
+		width: 1%; }
+		
+		.dashboard #content .send td.form textarea {
+			width: 20em;
+			height: 5em;
+		}
+		
+		/* make the all+none buttons look like
+		 * regular django submit buttons */
+		.dashboard #content .send .sel-all,
+		.dashboard #content .send .sel-none {
+			display: block;
+			background: #eee url("/assets/admin/img/admin/nav-bg.gif") repeat-x 0 50%;
+			border-bottom: 1px solid #aaa;
+			cursor: pointer;
+			width: 50%;
+			float: left;
+			margin-bottom: 5px;
+			padding: 2px 0;
+			text-align: center;
+		}
+			
+			/* split them with a tiny gap */
+			.dashboard #content .send .sel-none {
+				border-left: 1px solid #fff;
+				margin-left: -1px;
+			}
+		
+		.dashboard #content .send div {
+			clear: both; }
+	
+	/* don't let the list of recipients
+	 * blow up the layout. there can be
+	 * any number of them */
+	.dashboard #content .send #send-recipients {
+		padding-right: 5px;
+		overflow-y: scroll;
+		height: 9em;
+	}
+
+
 /* ---- notifications ---- */
 
 	/* prevent long alerts from blowing up the layout */
@@ -64,6 +122,12 @@
 
 /* ---- transaction log ---- */
 
+	/* prevent really big messages from smashing
+	 * the layout (they're rare, so just hide
+	 * the extra content) */
+	.dashboard #content-related .transactions {
+		overflow-x: hidden; }
+	
 	/* remove padding from cell, since nested
 	 * table has plenty of it's own padding */
 	.dashboard #content-related td.messages {

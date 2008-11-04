@@ -1,20 +1,135 @@
 <div class="send module">
-<form action="/send_sms/" method="post">
-<fieldset>
-	<div class="recipients">
-	Recipients:
-		{% for m in monitors %}
-	         <div>
-			<input type="checkbox" value="{{ m.pk }}" id="send-to-{{ m.pk }}" name="monitor-{{ m.pk }}" checked="true"/>
-			<label for="send-to-{{ m.pk }}">{{ m }}</label>
-		</div>
-		{% endfor %}
-	</div>
-	<div class="textarea"><div>
-	<!-- wrapped for nice graphical borders -->
-	<textarea name="sms_text" id="send-sms-text"></textarea>
-	</div></div>
-	<input type="submit" value="Send" />
-</fieldset>
-</form>
+	<form action="/send_sms/" method="post">
+		<fieldset>
+						
+			<table>
+				<caption>Send a Message to Field Monitor(s)</caption>
+				<tbody>
+					<tr>
+						<td class="form" id="send-form">
+							<div class="textarea"><div>
+								<textarea name="message"></textarea>
+							</div></div>
+	
+							<input type="submit" id="fm-send-submit" value="Send" />
+						</td>
+						<td>
+							<div class="recipients" id="send-recipients">
+								{% for m in monitors %}
+								<div>
+									<input type="checkbox" value="{{ m.pk }}" id="fm-monitor-{{ m.pk }}" name="monitor-{{ m.pk }}" />
+									<label for="fm-monitor-{{ m.pk }}">{{ m }}</label>
+								</div>
+								{% endfor %}
+							</div>
+							
+							<script type="text/javascript">
+								(function() {
+									/* set the 'checked' status of all monitors
+									 * at once, because there are a lot of them */
+									var select_all = function (state) {
+										$$("#send-recipients input").each (function(el) {
+											el.checked = state;
+										});
+									};
+									
+									/* element to hold all/none buttons */
+									var container = $("send-recipients");
+									var txta = $$("#send-form textarea")[0];
+									
+									/* ...and the SELECT NONE button */
+									new Element ("span", {
+										"html": "Select All",
+										"class": "sel-all",
+										"title": "Select all monitors",
+										"events": {
+											"click": function (ev) {
+												select_all (true);
+												txta.focus();
+										}}
+									}).inject (container, "before");
+									
+									/* create the SELECT ALL button */
+									new Element ("span", {
+										"html": "Select None",
+										"class": "sel-none",
+										"title": "Select no monitors",
+										"events": {
+											"click": function (ev) {
+												select_all (false);
+												txta.focus();
+										}}
+									}).inject (container, "before");
+									
+									
+									/* keep track of the last monitor
+									 * link that was clicked, so double-
+									 * clicked links can behave normally */
+									var last_link = null;
+									
+									/* watch all clicks for clicks on monitors */
+									$(document.body).addEvent ("click", function(ev) {
+										var url = "/inventory/monitor/";
+										var el = $(ev.target);
+										
+										if (el.get ("tag") == "a") {
+											if (el.get ("href").slice (0, 19) == url) {
+												
+												/* if this link has already been clicked,
+												 * then abort, and follow the link */
+												if (last_link == el)
+													return true;
+												
+												/* otherwise, this is the first click,
+												 * but note this link for next time */
+												el.set ("title", "Click again to follow link");
+												last_link = el;	
+												
+												/* attempt to find a matching monitor checkbox */
+												var pk = parseInt(el.get ("href").slice(19, -1));
+												var check = $("fm-monitor-" + pk);
+												if (check) {
+												
+													/* unselect all, except for the
+													 * monitor that we just clicked on */
+													select_all (false);
+													check.checked = true;
+													
+													/* scroll the monitor into view (in
+													 * the little recipients window), and
+													 * briefly flash the background */
+													var div = check.getParent();
+													var pos = div.getPosition (container);
+													container.scrollTo (0, pos.y);
+													div.highlight();
+													
+													/* put the caret into the message
+													 * textarea, so we can click, type,
+													 * hit return to send messages */
+													txta.focus();
+													
+													/* cancel the usual event */	
+													ev.stop();
+												}
+											}
+										}
+									});
+									
+									/* auto-size the text area to fill the white-space
+									 * below it (the recipients list is always higher) */
+									$(document).addEvent ("domready", function (ev) {
+										var cell_h = $("send-form").getSize().y;
+										var but_h  = $("fm-send-submit").getSize().y;
+										var rest   = 25; // sum of the padding, margins
+										                 // and borders in the cell
+										txta.setStyle("height", cell_h - but_h - rest);
+									});
+								})(); // module
+							</script>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+	</form>
 </div>

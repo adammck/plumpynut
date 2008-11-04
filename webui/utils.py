@@ -31,6 +31,7 @@ def blast(monitors, message, field=None):
 	sender = kannel.SmsSender("user", "password")
 	for m in monitors:
 		number = m.phone
+		
 		# passing a field implies that
 		# the message includes
 		# personalizeable strings

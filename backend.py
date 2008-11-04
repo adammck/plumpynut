@@ -24,7 +24,7 @@ class App(SmsApplication):
 	kw = SmsKeywords()
 	
 	# non-standard regex chunks
-	ALIAS = "([a-z\.]+)"
+	ALIAS = '([a-z\.]+)'
 	
 	
 	def __get(self, model, **kwargs):
@@ -81,7 +81,7 @@ class App(SmsApplication):
 		# something went wrong (probably
 		# missing the Levenshtein library)
 		except:
-			self.log("Couldn't import Levenshtein library", "err")
+			self.log("Couldn't import Levenshtein library", "warn")
 			return None
 		
 		# searches are case insensitive
@@ -111,12 +111,20 @@ class App(SmsApplication):
 		else: return None
 	
 	
+	
+	
 	def new_transaction(self, caller):
 		id = random.randint(11111111, 99999999)
 		
+		# fetch the monitor, and increment their incoming
+		# message counter (so they can be payed for the sms)
+		mon = self.__get(Monitor, phone=caller)
+		if mon is not None:
+			mon.incoming_messages += 1
+			mon.save()
+		
 		# when a new transaction is started, create an
 		# instance to bind the messages sent and received
-		mon = self.__get(Monitor, phone=caller)
 		return Transaction.objects.create(
 			identity=id,
 			phone=caller,
@@ -212,7 +220,7 @@ class App(SmsApplication):
 
 
 	# CANCEL ------------------------------------------------------------------
-	kw.prefix = "cancel"
+	kw.prefix = ["cancel", "cancle"]
 
 	@kw("(letters)")
 	def cancel_code(self, caller, code):
@@ -323,7 +331,7 @@ class App(SmsApplication):
 		self.respond(STR["help_alert"])
 	
 	@kw.invalid()
-	def help_help(self, caller):
+	def help_help(self, caller, *msg):
 		self.respond(STR["help_help"])
 
 	
@@ -332,7 +340,7 @@ class App(SmsApplication):
 	# <SUPPLY> <PLACE> <BENEFICIERIES> <QUANTITY> <CONSUMPTION> <BALANCE> --
 	kw.prefix = ""
 	
-	@kw("(letters) (letters)(?: (\d+))?(?: (\d+))?(?: (\d+))?(?: (\d+))?")
+	@kw("[\"'\s]*(letters)[,\.\s]*(letters)[,\.\s]*(\d+)(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?(?:[,\.\s]*(\d+))?[\.,\"']*")
 	def report(self, caller, sup_code, place_code, ben="", qty="", con="", bal=""):
 		
 		# ensure that the caller is known
@@ -403,7 +411,6 @@ class App(SmsApplication):
 		# fetch the supplylocation object, to update the current stock
 		# levels. if it doesn't already exist, just create it, because
 		# the administrators probably won't want to add them all...
-		
 		sp, created = SupplyPlace.objects.get_or_create(supply=sup, location=loc, area=area)
 		
 		# create the entry object, 
@@ -448,7 +455,55 @@ class App(SmsApplication):
 	# NO IDEA WHAT THE CALLER WANTS -------------------------------------------
 	
 	def incoming_sms(self, caller, msg):
-		raise CallerError(STR["error"])
+		self.log("No match by regex", "warn")
+		
+		# we will only attempt to guess if
+		# it looks like the caller is trying
+		# to use these functions
+		guess_funcs = (
+			self.identify,
+			self.report,
+			self.alert)
+		
+		while(len(msg) > 0):
+			found = False
+			
+			# iterate each guessable function, and each
+			# of its regexen without their tailing DOLLAR.
+			# since we couldn't find a real match, we're
+			# looking for a matching prefix (in case the
+			# sender has appended junk to their message,
+			# or concatenated multiple messages without
+			# proper delimitors)
+			for func in guess_funcs:
+				for regex in getattr(func, "regexen"):
+					pattern = regex.pattern.rstrip("$")
+					new_regex = re.compile(pattern, re.IGNORECASE)
+					
+					# does the message START with
+					# the applied pattern?
+					match = new_regex.match(msg)
+					if match:
+						
+						# log and dispatch the matching part, as if
+						# it were a regular incoming message
+						self.log("Prefix matches function: %s" % (func.func_name), "info")
+						self.dispatch_incoming_sms(caller, match.group(0))
+				
+						# drop the part of the message
+						# that we just dealt with, and
+						# continue with the next iteration
+						msg = new_regex.sub("", msg, 1).strip()
+						#if(len(msg)>0): self.log("Remaining text: %r" % msg, "info")
+						#else: self.log("Finished parsing message")
+						found = True
+						break
+			
+			# nothing matched in this iteration,
+			# so it won't ever. abort :(
+			if not found:
+				self.log("No match for: %r" % (msg), "warn")
+				raise CallerError(STR["error"])
 
 
 
