@@ -14,9 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
 from django.core.management import setup_environ
 
-from webui import settings 
-setup_environ(settings)
-from webui.inventory.models import * 
+from inventory.models import * 
 
 def blast(monitors, message, field=None):
 	
