@@ -1,5 +1,13 @@
 from datetime import datetime, timedelta
 import fpformat
+import os
+import sys
+import math
+
+from pygooglechart import SimpleLineChart
+from pygooglechart import Axis
+from pygooglechart import PieChart2D
+from pygooglechart import StackedVerticalBarChart
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
@@ -54,6 +62,14 @@ def to_print(request, app_label, model_name):
 	
 	return render_to_response("reference.html", {"regions": data})
 
+def refresh_graphs():
+	print graph_entries()
+	print graph_otps()
+	print graph_monitors()
+	print graph_avg_stat()
+
+	return 'refreshed graphs'
+
 def graph_entries(num_days=14):
 	# its a beautiful day
 	today = datetime.today().date()
@@ -79,12 +95,19 @@ def graph_entries(num_days=14):
 				count += 1
 		dates.append(d.day)
 		counts.append(count)
+    
+    	chart = SimpleLineChart(400, 100, y_range=(0, 100))
+	chart.add_data(counts)
+	chart.set_axis_labels(Axis.BOTTOM, dates)
+	chart.set_axis_labels(Axis.LEFT, ['', 50, 100])
+	chart.download('entries.png')
+	
+	return 'saved entries.png' 
 
-	return { "counts" : counts, "dates" : dates }
 
-
-def graph_monitors():
+def graph_monitors(num_days=14):
 	# pie chart of monitors
+	day_range = timedelta(days=num_days)
 	reported = 0
 	mons = Monitor.objects.all()
 	for m in mons:
@@ -92,8 +115,12 @@ def graph_monitors():
 			if m.latest_report.time.date() > (datetime.today().date() - day_range):
 				reported += 1
 
-	return { "unreported": (len(mons)-reported), \
-		"reported" : reported }
+	chart = PieChart2D(400, 100)
+	chart.add_data([(len(mons)-reported), reported])
+	chart.set_pie_labels(['', 'Reporting Monitors'])
+	chart.download('monitors.png')
+
+	return 'saved monitors.png' 
 	
 
 def graph_otps():
@@ -108,8 +135,12 @@ def graph_otps():
 	percent_visited = float(visited)/float(otps)
 	percent_not_visited = float(otps - visited)/float(otps)
 
-	return { "visited" : fpformat.fix(percent_visited, 1),\
-		"not_visited" : fpformat.fix(percent_not_visited, 1) }
+	chart = PieChart2D(400, 100)
+	chart.add_data([(percent_visited*100), (percent_not_visited*100)])
+	chart.set_pie_labels(['Visited OTPs', ''])
+	chart.download('otps.png')
+
+	return 'saved otps.png' 
 	
 
 def graph_avg_stat():	
@@ -138,6 +169,8 @@ def graph_avg_stat():
 	# visited, along with summing all
 	# their data
 	woreda_list = []
+
+	ent = Entry.objects.all()
 
 	for e in ent:
 		if e.supply_place.type == 'Woreda':
@@ -198,19 +231,28 @@ def graph_avg_stat():
 	d_n = 1 - d_a
 
 	# average otp and woreda data, 
-	# limit to 1 decimal place
-	o_b = fpformat.fix(float(o_b)/float(o_num), 1)
-	o_q = fpformat.fix(float(o_q)/float(o_num), 1)
-	o_c = fpformat.fix(float(o_c)/float(o_num), 1)
-	o_s = fpformat.fix(float(o_s)/float(o_num), 1)
-	w_b = fpformat.fix(float(w_b)/float(w_num), 1)
-	w_q = fpformat.fix(float(w_q)/float(w_num), 1)
-	w_c = fpformat.fix(float(w_c)/float(w_num), 1)
-	w_s = fpformat.fix(float(w_s)/float(w_num), 1)
+	o_b = (float(o_b)/float(o_num))
+	o_q = (float(o_q)/float(o_num))
+	o_c = (float(o_c)/float(o_num))
+	o_s = (float(o_s)/float(o_num))
+	w_b = (float(w_b)/float(w_num))
+	w_q = (float(w_q)/float(w_num))
+	w_c = (float(w_c)/float(w_num))
+	w_s = (float(w_s)/float(w_num))
 
-	return {"o_b" : o_b, "o_q" : o_q, "o_c" : o_c, "o_s" : o_s,\
-		"w_b" : w_b, "w_q" : w_q, "w_c" : w_c, "w_s" : w_s,\
-		"a" : fpformat.fix(d_a*100,1), "n" : fpformat.fix(d_n*100,1) } 
+	pie = PieChart2D(400, 100)
+	pie.add_data([(d_a*100), (d_n*100)])
+	pie.set_pie_labels(['Avg visited OTPs per woreda', ''])
+	pie.download('avg_otps.png')
+
+	bar = StackedVerticalBarChart(400,100)
+	bar.set_colours(['4d89f9','c6d9fd'])
+	bar.add_data([o_b, o_q, o_c, o_s])
+	bar.add_data([w_b, w_q, w_c, w_s])
+	bar.set_axis_labels(Axis.BOTTOM, ['Ben', 'Qty', 'Con', 'Bal'])
+	bar.download('avg_stat.png')
+
+	return 'saved avg_stat.png' 
 
 def map_entries():
 	pass
