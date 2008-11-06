@@ -4,10 +4,10 @@ import os
 import sys
 import math
 
-from pygooglechart import SimpleLineChart
-from pygooglechart import Axis
-from pygooglechart import PieChart2D
-from pygooglechart import StackedVerticalBarChart
+ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(ROOT, '..'))
+
+from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
@@ -100,7 +100,7 @@ def graph_entries(num_days=14):
 	chart.add_data(counts)
 	chart.set_axis_labels(Axis.BOTTOM, dates)
 	chart.set_axis_labels(Axis.LEFT, ['', 50, 100])
-	chart.download('entries.png')
+	chart.download('graphs/entries.png')
 	
 	return 'saved entries.png' 
 
@@ -118,7 +118,7 @@ def graph_monitors(num_days=14):
 	chart = PieChart2D(400, 100)
 	chart.add_data([(len(mons)-reported), reported])
 	chart.set_pie_labels(['', 'Reporting Monitors'])
-	chart.download('monitors.png')
+	chart.download('graphs/monitors.png')
 
 	return 'saved monitors.png' 
 	
@@ -136,9 +136,9 @@ def graph_otps():
 	percent_not_visited = float(otps - visited)/float(otps)
 
 	chart = PieChart2D(400, 100)
-	chart.add_data([(percent_visited*100), (percent_not_visited*100)])
-	chart.set_pie_labels(['Visited OTPs', ''])
-	chart.download('otps.png')
+	chart.add_data([(percent_not_visited*100), (percent_visited*100)])
+	chart.set_pie_labels(['', 'Visited OTPs'])
+	chart.download('graphs/otps.png')
 
 	return 'saved otps.png' 
 	
@@ -241,16 +241,16 @@ def graph_avg_stat():
 	w_s = (float(w_s)/float(w_num))
 
 	pie = PieChart2D(400, 100)
-	pie.add_data([(d_a*100), (d_n*100)])
-	pie.set_pie_labels(['Avg visited OTPs per woreda', ''])
-	pie.download('avg_otps.png')
+	pie.add_data([(d_n*100), (d_a*100)])
+	pie.set_pie_labels(['', 'Avg visited OTPs per woreda'])
+	pie.download('graphs/avg_otps.png')
 
 	bar = StackedVerticalBarChart(400,100)
 	bar.set_colours(['4d89f9','c6d9fd'])
 	bar.add_data([o_b, o_q, o_c, o_s])
 	bar.add_data([w_b, w_q, w_c, w_s])
 	bar.set_axis_labels(Axis.BOTTOM, ['Ben', 'Qty', 'Con', 'Bal'])
-	bar.download('avg_stat.png')
+	bar.download('graphs/avg_stat.png')
 
 	return 'saved avg_stat.png' 
 

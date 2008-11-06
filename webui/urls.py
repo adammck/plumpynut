@@ -11,6 +11,9 @@ admin.autodiscover()
 urlpatterns = patterns("",
     (r'^assets/(?P<path>.*)$', "django.views.static.serve",
         {"document_root": os.path.dirname(__file__) + "/static"}),
+
+    (r'^graphs/(?P<path>.*)$', "django.views.static.serve",
+        {"document_root": os.path.dirname(__file__) + "/graphs"}),
     
     # exporting is magic!
 	(r'^(?P<app_label>.+?)/(?P<model_name>.+?)/export/excel/$', ex_views.to_excel),
