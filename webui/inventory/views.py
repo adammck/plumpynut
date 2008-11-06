@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# vim: noet
+
 from datetime import datetime, timedelta
 import fpformat
 import os
@@ -256,3 +259,8 @@ def graph_avg_stat():
 
 def map_entries():
 	pass
+
+if __name__ == "__main__":
+	if sys.argv:
+		if sys.argv[1] == refresh_graphs:
+			print refresh_graphs()
