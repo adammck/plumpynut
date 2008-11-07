@@ -1,9 +1,13 @@
 {% extends "admin/base.html" %}
+{% load includes %}
 
-{% block title %}{{ title }} | uniSMS{% endblock %}
+{% block title %}{{ title }} | rapidSMS{% endblock %}
 {% block extrastyle %}<link rel="stylesheet" href="/assets/css/admin.css" />{% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="/" title="Return to the Dashboard">uniSMS :: Supply Monitoring System</a></h1>
+<h1 id="site-name"><a href="/" title="Return to the Dashboard">rapidSMS :: Supply Monitoring System</a></h1>
+<div id="period">
+	{% incl_reporting_period %}
+</div>
 {% endblock %}
 

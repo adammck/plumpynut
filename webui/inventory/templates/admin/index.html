@@ -10,12 +10,9 @@
 
 {% block content %}
 <div id="content-main">
-<div class="module graph">
-	{% incl_graph %}
-</div>
-<div class="module events">
-	{% incl_grid %}
-</div>
+<!--<div class="module graph">
+	{{ incl_graph }}
+</div>-->
 
 
 {% if app_list %}
@@ -52,16 +49,21 @@
 {% else %}
     <p>{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
+
+<div class="module events">
+	{% incl_grid %}
+</div>
+
 </div>
 {% endblock %}
 
 {% block sidebar %}
 <div id="content-related">
-	{% incl_notifications %}
+	{% incl_send %}
 	
-	<div class="module send">
-		{% incl_send %}
-	</div>
+	{% incl_export_form %}
+	
+	{% incl_notifications %}
 
 	<div class="msg-log">
 		<div class="transactions module">
