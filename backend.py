@@ -220,7 +220,38 @@ class App(SmsApplication):
 
 
 	# CANCEL ------------------------------------------------------------------
-	kw.prefix = "cancel"
+	kw.prefix = ["cancel", "cancle"]
+
+	@kw("(letters)")
+	def cancel_code(self, caller, code):
+		monitor = self.__identify(caller, "cancelling")
+
+		try:
+			# attempt to find monitor's 
+			# entry with this code
+			entry = Entry.objects.filter(
+				monitor=monitor,\
+				supply_place__location__code=code)\
+				.order_by('-time')[0]
+
+			# delete it and notify
+			entry.delete()
+			self.respond(STR["cancel_code_ok"] % (code))
+
+		except (ObjectDoesNotExist, IndexError):
+			try:
+				# try again for woreda code
+				entry = Entry.objects.filter(
+					monitor=monitor,\
+					supply_place__area__code=code)\
+					.order_by('-time')[0]
+
+				# delete it and notify
+				entry.delete()
+				self.respond(STR["cancel_code_ok"] % (code))
+
+			except (ObjectDoesNotExist, IndexError):
+				raise CallerError(STR["cancel_none"])
 
 	@kw.blank()
 	def cancel(self, caller):
@@ -400,15 +431,23 @@ class App(SmsApplication):
 		# the administrators probably won't want to add them all...
 		sp, created = SupplyPlace.objects.get_or_create(supply=sup, location=loc, area=area)
 		
-		# create the entry object, with
-		# no proper validation (todo!)
-		Entry.objects.create(
-			monitor=monitor,
-			supply_place=sp,
-			beneficiaries=ben,
-			quantity=qty,
-			consumption=con,
-			balance=bal)
+		# create the entry object, 
+		# unless its a recent duplicate 
+		try:
+			Entry.objects.filter(
+				monitor=monitor,
+				supply_place=sp,
+				time__gt=date.today())\
+				.order_by('-time')[0]
+
+		except (ObjectDoesNotExist, IndexError):
+			Entry.objects.create(
+				monitor=monitor,
+				supply_place=sp,
+				beneficiaries=ben,
+				quantity=qty,
+				consumption=con,
+				balance=bal)
 		
 		# collate all of the information submitted, to
 		# be sent back and checked by the caller
@@ -420,10 +459,14 @@ class App(SmsApplication):
 		
 		# notify the caller of their new entry
 		# this doesn't seem to be localizable
-		self.respond(
-			"Received %s report for %s %s by %s: %s.\nIf this is not correct, reply with CANCEL" %\
-			(sup.name, sp.type, sp.place, monitor, ", ".join(info)))
-
+		if loc is None:
+			self.respond(
+				"Received %s report for %s %s by %s: %s.\nIf this is not correct, reply with CANCEL %s" %\
+				(sup.name, sp.type, sp.place, monitor, ", ".join(info), area))
+		if area is None:
+			self.respond(
+				"Received %s report for %s %s by %s: %s.\nIf this is not correct, reply with CANCEL %s" %\
+				(sup.name, sp.type, sp.place, monitor, ", ".join(info), loc))
 
 	
 

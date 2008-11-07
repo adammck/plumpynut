@@ -1,0 +1,34 @@
+<img src="http://chart.apis.google.com/chart?
+chs=400x100
+&amp;cht=lc
+&amp;chd=t:{% for c in counts %}{{ c }}{% if forloop.last %}.0{% else %}.0,{% endif %}{% endfor %}
+&amp;chxt=x,y
+&amp;chxl=
+0:|{% for d in dates %}{{ d }}|{% endfor %}
+" />
+
+<img src="http://chart.apis.google.com/chart?
+chs=400x100
+&amp;cht=p
+&amp;chd=t:{{ unreported }}.0,{{ reported }}.0
+&amp;chl=Non-Reporting%20Monitors|Reporting%20Monitors
+" />
+
+<img src="http://chart.apis.google.com/chart?
+chs=400x100
+&amp;cht=p
+&amp;chd=t:{{ not_visited }},{{ visited }}
+&amp;chl=Not-visited%20OTPs|Visited%20OTPs
+" />
+
+
+<img src="http://chart.apis.google.com/chart?
+chs=400x100
+&amp;cht=bvs
+&amp;chco=4d89f9,c6d9fd
+&amp;chd=t:{{ o_b }},{{ o_q }},{{ o_c }},{{ o_s }}|
+{{ w_b }},{{ w_q }},{{ w_c }},{{ w_s }}
+&amp;chxt=x
+&amp;chxl=
+0:|Ben|Qty|Con|Bal
+" />

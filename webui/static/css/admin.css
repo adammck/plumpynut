@@ -5,7 +5,7 @@
  * styles, to make it look more like a UNICEF app */
 
 body {
-	background: #eee;
+	background: #eef;
 }
 
 #container {
@@ -20,17 +20,18 @@ body {
 
 /* steal header bg from unicef.org */
 #header {
-	background: url("../gif/header.gif") repeat-x;
+	background: url("../png/header-bg.png") repeat-x;
 	padding-top: 23px;
 	padding-bottom: 33px;
 	position: relative;
+	color: #ccf;
 }
 	
 	/* align in the middle of the
 	 * unicef blue stripe of header bg,
 	 * and display logo on the right */
 	#branding h1 {
-		background: url("../gif/unicef.gif") no-repeat 100% 50%;
+		background: url("../png/unicef.png") no-repeat 100% 50%;
 		line-height: 65px;
 		color: #fff;
 		margin: 0;
@@ -46,6 +47,13 @@ body {
 		 * it's too long (blows up form) */
 		body.login #branding h1 {
 			text-indent: -9999px; }
+		
+		#branding h1 a {
+			height: 65px;
+			display: block;
+			text-indent: -9999px;
+			background: url("../png/rapidsms.png") no-repeat 0 50%;
+		}
 
 	/* align with dark stripe
 	 * of header bg */	
@@ -55,14 +63,26 @@ body {
 		right: 10px;
 		line-height: 33px;
 	}
+	
+	#period {
+		position: absolute;
+		line-height: 23px;
+		font-size: 11px;
+		right: 5px;
+		top: 0;
+	}
+	
+		#period span {
+			color: #eef; }
 
 
 #content {
 	margin: 15px;
+	margin-bottom: 0;
 }
 
 	#content h1 {
-		color: #007bd6;
+		color: #0091C7;
 		margin-bottom: 15px;
 	}
 
@@ -74,7 +94,7 @@ body {
 	#content .module h2,
 	#content .module caption,
 	#content .inline-group h2 {
-		background: #7eccff url("../png/h2.png") repeat-x;
+		background: #74d7e3 url("../png/h2.png") repeat-x;
 	}
 
 	/* add space between
@@ -84,6 +104,32 @@ body {
 		margin-top: 15px;
 	}
 
+
+.map-info { }
+
+	.map-info h2 {
+		margin: 0 0 10px 0;
+		text-align: center;
+	}
+
+	.map-info table {
+		width: 100%; }
+
+		.map-info caption {
+			padding: 4px;
+			background: #eee;
+			margin-bottom: 10px;
+		}
+		
+		.map-info td {
+			width: 1%; }
+
+	.map-info div.datetime {
+		text-align: center;
+		margin-top: 10px;
+		font-size: 80%;
+		color: #aaa;
+	}
 
 /* the footer doesn't seem to be in
  * use, so hide it for the time being */
