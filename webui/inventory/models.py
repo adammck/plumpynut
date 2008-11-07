@@ -270,6 +270,7 @@ class Message(models.Model):
 	time = models.DateTimeField(auto_now_add=True)
 	message = models.CharField(max_length=160)
 	is_outgoing = models.BooleanField()
+	is_virtual = models.BooleanField()
 	
 	# todo: what is this for? the screen log?
 	def __unicode__(self):

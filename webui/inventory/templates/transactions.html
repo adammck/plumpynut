@@ -13,8 +13,8 @@
 			<td class="messages">
 				<table>
 					{% for m in t.message_set.all %}
-					<tr class="{% if m.is_outgoing %}out{% else %}in{% endif %}{% if forloop.first %} first{% endif %}{% if forloop.last %} last{% endif %}">
-						<td class="dir"{% if m.is_outgoing %} title="Outgoing">&raquo;{% else %} title="Incoming">&laquo;{% endif %}</td>
+					<tr class="{% if m.is_outgoing %}out{% else %}in{% endif %}{% if m.is_virtual %} virtual{% endif %}{% if forloop.first %} first{% endif %}{% if forloop.last %} last{% endif %}">
+						<td class="dir"{% if m.is_outgoing %} title="Outgoing">&raquo;{% else %} title="{% if m.is_virtual %}Virtual {% endif %}Incoming">&laquo;{% endif %}</td>
 						
 						<td class="msg">
 							{% if m.monitor %}<span class="to" title="Number: {{ m.monitor.phone }}">To: {{ m.monitor }}</span>{% else %}

@@ -504,17 +504,25 @@ class App(SmsApplication):
 					match = new_regex.match(msg)
 					if match:
 						
+						# hack: since we're about to recurse via d_i_sms,
+						# the chopped up message will be entered into the
+						# database as if it were a real message, which will
+						# confuse the log. this flag instructs before_incoming
+						# to mark the following messages as virtual
+						self.processing_virtual = True
+						
 						# log and dispatch the matching part, as if
 						# it were a regular incoming message
 						self.log("Prefix matches function: %s" % (func.func_name), "info")
 						self.dispatch_incoming_sms(caller, match.group(0))
-				
+						
+						# revert to normal behavior
+						self.processing_virtual = False
+						
 						# drop the part of the message
 						# that we just dealt with, and
 						# continue with the next iteration
 						msg = new_regex.sub("", msg, 1).strip()
-						#if(len(msg)>0): self.log("Remaining text: %r" % msg, "info")
-						#else: self.log("Finished parsing message")
 						found = True
 						break
 			
@@ -544,13 +552,20 @@ class App(SmsApplication):
 		if mon == self.transaction.monitor: mon = None
 		if ph  == self.transaction.phone:   ph  = None
 		
+		# see above (hack) for explanation
+		# of t his 'virtual' flag
+		virt = False
+		if hasattr(self, "processing_virtual"):
+			virt = self.processing_virtual
+		
 		# create a new log entry
 		Message.objects.create(
 			transaction=self.transaction,
 			is_outgoing=False,
 			phone=caller,
 			monitor=mon,
-			message=msg)
+			message=msg,
+			is_virtual=virt)
 	
 	
 	# as above...
