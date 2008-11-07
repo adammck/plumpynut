@@ -95,7 +95,7 @@ def blast_numbers(numbers, message):
 		sending += 1
 		print 'Blasted to %d of %d numbers...' % (sending, len(numbers))
         return 'Blasted %s to %d numbers with %d failures' % (message, sending, (len(numbers) - sending))
-		
+
 
 if __name__ == "__main__":
 	import inspect

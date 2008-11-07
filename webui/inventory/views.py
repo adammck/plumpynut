@@ -179,5 +179,11 @@ def graph_avg_places_stat():
 
 
 def map_entries(request):
-	return render_to_response("map/entries.html")
+	def has_coords(entry):
+		loc = entry.supply_place.location
+		if loc is None: return False
+		return  (loc.latitude is not None) and (loc.longitude is not None)
+		
+	entries = filter(has_coords, Entry.objects.all())
+	return render_to_response("map/entries.html", { "entries": entries })
 
