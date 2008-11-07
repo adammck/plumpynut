@@ -4,6 +4,11 @@
 import os
 root = os.path.dirname(__file__)
 
+# add the parent directory to the python
+# path, so we can grab the shared libs
+import sys
+sys.path.append(os.path.dirname(root))
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -25,7 +30,7 @@ DATABASE_USER   = 'unicef'
 # yes, here is the password to the development
 # machine that we're currently running unisms
 # on - in a public git repo, no less!
-DATABASE_PASSWORD = 'm3p3m3p3'
+DATABASE_PASSWORD = 'mepemepe'
 
 
 
@@ -76,7 +81,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware'
 )
 
 ROOT_URLCONF = 'webui.urls'

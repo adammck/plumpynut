@@ -119,16 +119,12 @@ class Area(models.Model):
 	number_of_OTPs = property(_get_number_of_locations)
 
 
-class GeoPoint(models.Model):
-	latitude = models.DecimalField(max_digits=8, decimal_places=6)
-	longitude = models.DecimalField(max_digits=8, decimal_places=6)
-	
-
 class Location(models.Model):
 	name = models.CharField(max_length=100, help_text="Full name of the OTP")
 	code = models.CharField(max_length=20, unique=True, editable=False)
 	area = models.ForeignKey(Area, help_text="Name of woreda")
-	point = models.ForeignKey(GeoPoint, null=True, blank=True, help_text="The physical location of this OTP")
+	latitude = models.DecimalField(max_digits=8, decimal_places=6, null=True, blank=True, help_text="The physical latitude of this OTP")
+	longitude = models.DecimalField(max_digits=8, decimal_places=6, null=True, blank=True, help_text="The physical longitude of this OTP")
 	
 	def save(self):
 		# if this OTP does not already

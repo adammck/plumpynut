@@ -1,0 +1,75 @@
+<div class="export-form module">
+	<form action="/export/" method="post">
+	<table>
+		<caption>Quick Reports</caption>
+		<thead>
+			<tr>
+				<td colspan="4">
+					<input type="submit" class="export-button" value="Export" />
+					
+					Report On:
+					<select id="export-form-model" name="model">{% for model in models %}
+						<option value="{{ model.app_label }}-{{ model.name }}">{{ model.caption }}</option>{% endfor %}
+					</select>
+				</td>
+			</tr>
+			<tr id="export-filter-headers" style="display: none;">
+				<th>Filter Field</th>
+				<th>Operator</th>
+				<th>Value</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr style="display: none;">
+				<td class="field">{% for model in models %}
+					<select class="fields{% if forloop.first %} visible{% endif %} export-fields-{{ model.app_label }}-{{ model.name }}" name="{{ model.app_label }}-{{ model.name }}-field">{% for field in model.fields %}
+						<option title="{{ field.help_text }}" value="{{ field.name }}">{{ field.caption }}</option>{% endfor %}
+					</select>{% endfor %}
+				</td>
+				<td>
+					<select name="operator">
+						<option value="lt">Less Than</option>
+						<option value="gt">Greater Than</option>
+						<option value="">Equal To</option>
+					</select>
+				</td>
+				<td>
+					<input type="text" name="value" size="8" value="10" />
+				</td>
+				<td class="deletelink">
+					<span title="Remove this Filter"></span>
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="4" id="export-add-filter">
+					<span class="addlink">Add a Filter</span>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+	</form>
+</div>
+<script type="text/javascript">
+	(function() {
+		var del_filter = function(e) {
+		};
+	
+		/* hide all field dropdowns, then show the new active ones */
+		$("export-form-model").addEvent("change", function(e) {
+			$$(".export-form select.fields").removeClass("visible");
+			$$(".export-fields-" + e.target.value).addClass("visible");
+		});
+	
+		/* when the "add filter" link is clicked, clone the
+		 * first row filters and append it to the end */
+		$("export-add-filter").addEvent("click", function(e) {
+			var tbody = $$(".export-form tbody")[0];
+			tbody.getFirst().clone().setStyle("display", "").inject(tbody);
+			
+			$("export-filter-headers").setStyle("display", "");
+		});
+	})();
+</script>
