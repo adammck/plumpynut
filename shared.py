@@ -41,7 +41,7 @@ def nested_fields(model, max_depth=4):
 			# caption (containing prefixes) and the class itself
 			else:
 				filter = "__".join([f.name for f in my_nest])
-				label = " > ".join([capfirst(translation.ungettext(f.verbose_name, "", 1)) for f in my_nest])
+				label = "/".join([capfirst(translation.ungettext(f.verbose_name, "", 1)) for f in my_nest])
 				fields.append((filter, label, field))
 		
 		return fields
