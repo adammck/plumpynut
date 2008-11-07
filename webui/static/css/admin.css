@@ -5,7 +5,7 @@
  * styles, to make it look more like a UNICEF app */
 
 body {
-	background: #eef;
+	background: #eef url("../png/page-bg.png") repeat-y 0 50%;
 }
 
 #container {
