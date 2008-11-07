@@ -122,6 +122,8 @@
 		white-space: normal; }
 
 
+
+
 /* ---- quick export form ---- */
 
 	.dashboard #content .export-form select.fields { display: none; }
@@ -185,6 +187,13 @@
 	.dashboard #content-related td.messages tr.in         { background: #fff8ff; }
 	.dashboard #content-related td.messages tr.out td.dir { color: #0f0; }
 	.dashboard #content-related td.messages tr.out        { background: #f8ffff; }
+	
+	
+	.dashboard #content-related td.messages tr.in.virtual        { background: #fff; }
+	.dashboard #content-related td.messages tr.in.virtual td.dir { color: #faa; }
+	.dashboard #content-related td.messages tr.in.virtual td.msg { color: #ccc; }
+	
+	
 
 	/* for messages that aren't explicitly linked to a monitor,
 	 * include the destination number off to the right */
