@@ -21,7 +21,9 @@
    for the incomming/outgoing msg log */
 .dashboard #content-related {
 	margin-right: -39em;
-	width: 38em;
+	width: 37em;
+	padding-left: 1em;
+	border-left: 1px solid #e3f8fa;
 }
 
 .dashboard .colMS {
@@ -109,6 +111,8 @@
 		overflow-y: scroll;
 		height: 9em;
 	}
+
+
 
 
 /* ---- notifications ---- */
