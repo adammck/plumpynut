@@ -39,7 +39,7 @@
 /* shrink the text in the right column,
  * because there's a whole lot of data */
 .dashboard #content-related td {
-	font-size: 10px; }
+	font-size: 11px; }
 
 /* hide the captions on the add and change
  * links, to make more room for data */
@@ -118,6 +118,12 @@
 		white-space: normal; }
 
 
+/* ---- quick export form ---- */
+
+	.dashboard #content .export-form select.fields { display: none; }
+	.dashboard #content .export-form select.fields.visible { display: inline; }
+
+
 
 
 /* ---- transaction log ---- */
@@ -147,10 +153,10 @@
 	}
 
 	/* colorize cells to indicate direction */
-	.dashboard #content-related td.messages table tr.in td.dir  { color: #f00; }
-	.dashboard #content-related td.messages table tr.in { background: #fff8ff; }
+	.dashboard #content-related td.messages tr.in  td.dir { color: #f00; }
+	.dashboard #content-related td.messages tr.in         { background: #fff8ff; }
 	.dashboard #content-related td.messages tr.out td.dir { color: #0f0; }
-	.dashboard #content-related td.messages tr.out { background: #f8ffff; }
+	.dashboard #content-related td.messages tr.out        { background: #f8ffff; }
 
 	/* for messages that aren't explicitly linked to a monitor,
 	 * include the destination number off to the right */

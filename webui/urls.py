@@ -12,9 +12,13 @@ urlpatterns = patterns("",
     (r'^assets/(?P<path>.*)$', "django.views.static.serve",
         {"document_root": os.path.dirname(__file__) + "/static"}),
     
+	(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to',
+		{'url': '/assets/favicon.ico'}),
+    
     # exporting is magic!
 	(r'^(?P<app_label>.+?)/(?P<model_name>.+?)/export/excel/$', ex_views.to_excel),
 	(r'^(?P<app_label>.+?)/(?P<model_name>.+?)/export/print/$', in_views.to_print),
+	(r'^export/$', ex_views.export),
      
     # send sms
 	(r'^send_sms/$', 'inventory.views.send_sms'),
