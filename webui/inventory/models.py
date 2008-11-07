@@ -154,9 +154,9 @@ class Location(models.Model):
 
 
 class SupplyPlace(models.Model):
-	supply = models.ForeignKey(Supply) 
-	location = models.ForeignKey(Location, blank=True, null=True, help_text="Name of OTP")
-	area = models.ForeignKey(Area, blank=True, null=True, help_text="Name of Woreda")
+	supply = models.ForeignKey(Supply)
+	location = models.ForeignKey(Location, verbose_name="OTP", blank=True, null=True, help_text="Name of OTP")
+	area = models.ForeignKey(Area, verbose_name="Woreda", blank=True, null=True, help_text="Name of Woreda")
 	quantity = models.PositiveIntegerField(blank=True, null=True, help_text="Balance at OTP")
 	
 	def __unicode__(self):
@@ -221,12 +221,12 @@ class Report(models.Model):
 
 class Entry(models.Model):
 	monitor = models.ForeignKey(Monitor, help_text="Field monitor")
-	supply_place = models.ForeignKey(SupplyPlace, help_text="Reporting location")
+	supply_place = models.ForeignKey(SupplyPlace, verbose_name="Place", help_text="The OTP or Woreda which this report was sent from")
 	time = models.DateTimeField(auto_now_add=True)
-	beneficiaries = models.PositiveIntegerField(null=True, help_text="Number of benficiaries")
-	quantity = models.PositiveIntegerField(null=True, help_text="Quantity")
-	consumption = models.PositiveIntegerField(null=True, help_text="Consumption quantity")
-	balance = models.PositiveIntegerField(null=True, help_text="Balance at OTP")
+	beneficiaries = models.PositiveIntegerField("New Admissions", null=True)
+	quantity = models.PositiveIntegerField("Received Quantity", null=True)
+	consumption = models.PositiveIntegerField("Consumption", null=True)
+	balance = models.PositiveIntegerField("Current Stock Balance", null=True)
 
 	def __unicode__(self):
 		return "%s on %s" %\

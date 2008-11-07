@@ -164,7 +164,7 @@ def incl_export_form(context):
 	
 	def no_auto_fields(field):
 		from django.db import models
-		return not isinstance(field, models.AutoField)
+		return not isinstance(field[2], models.AutoField)
 	
 	models = []	
 	for model, m_admin in admin.site._registry.items():
