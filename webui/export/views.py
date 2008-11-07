@@ -1,6 +1,8 @@
 from django import http
 from django.db import models
 from django.utils.text import capfirst
+from django.core.exceptions import FieldError
+
 
 def _get_model(app_label, model_name):
 	model = models.get_model(app_label, model_name)
@@ -14,10 +16,36 @@ def _get_model(app_label, model_name):
 	return model
 
 
-def to_excel(request, app_label, model_name):
+def to_excel(request, app_label, model_name, req_filters=None):
 	model = _get_model(app_label, model_name)
 	max_depth = 8
 	rows = []
+	
+	# if no filters were explictly passed,
+	# then we will look for them in the GET
+	if req_filters is None:
+		req_filters = request.GET
+	
+	# build a dict of filters, to control
+	# which objects we get. todo: is this
+	# dangerous? i can't see any way that
+	# it is, but it seems kind of wrong
+	filters = {}
+	for k ,v in req_filters.items():
+		filters[str(k)] = v
+	
+	# fetch the data (might raise if any of the
+	# params couldn't be matched to model fields
+	try:
+		export_data = model.objects.filter(**filters)
+	
+	except FieldError, e:
+		return http.HttpResponse(e.message,
+		status=500, mimetype="text/plain")
+	
+	# sort the records if requested
+	if "sort" in req_filters:
+		export_data = export_data.order_by(str(req_filters["sort"]))
 	
 	
 	# this function builds a flat list of column titles (verbose names)
@@ -72,7 +100,7 @@ def to_excel(request, app_label, model_name):
 	
 	
 	# the matrix of dumped data
-	for object in model.objects.all():
+	for object in export_data:
 		row = "".join(build_row(model, object))
 		rows.append("<tr>%s</tr>" % (row))
 	
@@ -84,4 +112,22 @@ def to_excel(request, app_label, model_name):
 	resp = http.HttpResponse(html, mimetype='application/vnd.ms-excel')
 	resp["content-disposition"] = "attachment; filename=%s.xls" % model_name
 	return resp
+
+
+def export(request):
+	app_label, model_name = request.POST['model'].split("-")
+	model = _get_model(app_label, model_name)
+	filters = {}
+	
+	filter_key = "%s-%s-field" % (app_label, model_name)
+	field = request.POST[filter_key]
+	
+	# if an operator was posted, then apply it
+	# to the field name, to pass to the django orm
+	if "operator" in request.POST:
+		op = request.POST["operator"]
+		if op != "": field += "__%s" % (op)
+	
+	filters = {field: request.POST["value"] }
+	return to_excel(request, app_label, model_name, filters)
 
