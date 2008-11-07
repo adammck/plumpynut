@@ -7,15 +7,21 @@ import os
 import sys
 import math
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(ROOT, '..'))
-
 from pygooglechart import SimpleLineChart, Axis, PieChart2D, StackedVerticalBarChart
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
-from inventory.models import *
+
+from django.core.management import setup_environ
+from webui import settings
+setup_environ(settings)
+
+from webui.inventory.models import *
 from webui.utils import * 
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(ROOT, '..'))
+
 
 def send_sms(request):
 	if request.method != 'POST':
@@ -99,11 +105,12 @@ def graph_entries(num_days=14):
 		dates.append(d.day)
 		counts.append(count)
     
-    	chart = SimpleLineChart(400, 100, y_range=(0, 100))
-	chart.add_data(counts)
-	chart.set_axis_labels(Axis.BOTTOM, dates)
-	chart.set_axis_labels(Axis.LEFT, ['', 50, 100])
-	chart.download('graphs/entries.png')
+    	line = SimpleLineChart(400, 100, y_range=(0, 100))
+	line.add_data(counts)
+	line.set_axis_labels(Axis.BOTTOM, dates)
+	line.set_axis_labels(Axis.LEFT, ['', 50, 100])
+	line.set_colours(['0091C7'])
+	line.download('webui/graphs/entries.png')
 	
 	return 'saved entries.png' 
 
@@ -118,10 +125,12 @@ def graph_monitors(num_days=14):
 			if m.latest_report.time.date() > (datetime.today().date() - day_range):
 				reported += 1
 
-	chart = PieChart2D(400, 100)
+	chart = PieChart2D(300, 100)
 	chart.add_data([(len(mons)-reported), reported])
-	chart.set_pie_labels(['', 'Reporting Monitors'])
-	chart.download('graphs/monitors.png')
+	#chart.set_pie_labels(['', 'Reporting Monitors'])
+	chart.set_legend(['Non-reporting Monitors', 'Reporting Monitors'])
+	chart.set_colours(['0091C7','0FBBD0'])
+	chart.download('webui/graphs/monitors.png')
 
 	return 'saved monitors.png' 
 	
@@ -138,10 +147,12 @@ def graph_otps():
 	percent_visited = float(visited)/float(otps)
 	percent_not_visited = float(otps - visited)/float(otps)
 
-	chart = PieChart2D(400, 100)
+	chart = PieChart2D(300, 100)
 	chart.add_data([(percent_not_visited*100), (percent_visited*100)])
-	chart.set_pie_labels(['', 'Visited OTPs'])
-	chart.download('graphs/otps.png')
+	#chart.set_pie_labels(['', 'Visited OTPs'])
+	chart.set_legend(['Non-visited OTPs', 'Visited OTPs'])
+	chart.set_colours(['0091C7','0FBBD0'])
+	chart.download('webui/graphs/otps.png')
 
 	return 'saved otps.png' 
 	
@@ -243,24 +254,22 @@ def graph_avg_stat():
 	w_c = (float(w_c)/float(w_num))
 	w_s = (float(w_s)/float(w_num))
 
-	pie = PieChart2D(400, 100)
+	pie = PieChart2D(300, 100)
 	pie.add_data([(d_n*100), (d_a*100)])
-	pie.set_pie_labels(['', 'Avg visited OTPs per woreda'])
-	pie.download('graphs/avg_otps.png')
+	#pie.set_pie_labels(['', 'Avg visited OTPs per woreda'])
+	pie.set_legend(['Avg non-visted OTPs per woreda', 'Avg visited OTPs per woreda'])
+	pie.set_colours(['0091C7','0FBBD0'])
+	pie.download('webui/graphs/avg_otps.png')
 
-	bar = StackedVerticalBarChart(400,100)
-	bar.set_colours(['4d89f9','c6d9fd'])
-	bar.add_data([o_b, o_q, o_c, o_s])
-	bar.add_data([w_b, w_q, w_c, w_s])
-	bar.set_axis_labels(Axis.BOTTOM, ['Ben', 'Qty', 'Con', 'Bal'])
-	bar.download('graphs/avg_stat.png')
+	#bar = StackedVerticalBarChart(400,100)
+	#bar.set_colours(['4d89f9','c6d9fd'])
+	#bar.add_data([o_b, o_q, o_c, o_s])
+	#bar.add_data([w_b, w_q, w_c, w_s])
+	#bar.set_axis_labels(Axis.BOTTOM, ['Ben', 'Qty', 'Con', 'Bal'])
+	#bar.download('webui/graphs/avg_stat.png')
 
 	return 'saved avg_stat.png' 
 
 def map_entries():
 	pass
 
-if __name__ == "__main__":
-	if sys.argv:
-		if sys.argv[1] == refresh_graphs:
-			print refresh_graphs()
