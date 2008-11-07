@@ -6,13 +6,45 @@
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAg-8XYORS7v1h_9zDQNMVAhSVA0KX3RHSzNnk6nT8C9kt2staMxR_mIYMiXdrlrK5Te4_By9-iZF1mQ" type="text/javascript"></script>
 <div id="map" style="width: 100%; height: 500px;"></div>
 
+<div id="map-entries" style="display: none;">
+	{% for e in entries %}
+	<div id="entry-{{ e.pk }}" class="map-info">
+		<h2>{{ e.supply_place.location }} ({{ e.supply_place.location.code }})</h2>
+		<table>
+			<caption>
+				Reported by: <strong>{{ e.monitor }}</strong>
+			</caption>
+			<tbody>
+				<tr>
+					<th>New Admissions</th>
+					<td>{{ e.beneficiaries }}</td>
+				</tr>
+				<tr>
+					<th>Received Quantity</th>
+					<td>{{ e.quantity }}</td>
+				</tr>
+				<tr>
+					<th>Consumption</th>
+					<td>{{ e.consumption }}</td>
+				</tr>
+				<tr>
+					<th>Stock Balance</th>
+					<td>{{ e.balance }}</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="datetime">{{ e.time }}</div>
+	</div>
+	{% endfor %}
+</div>
+
 <script type="text/javascript">
-	var UNICEF = new GLatLng(37.0625, -95.677068);
+	var UNICEF = new GLatLng(9.010507476905097, 38.75518441200256);
 	
 	//$(document.body).addEvent ("load", function() {
 		if (GBrowserIsCompatible()) {
 			var map = new GMap2($("map"));
-			map.setCenter(UNICEF, 10);
+			map.setCenter(UNICEF, 8);
 			
 			// switch to hybrid mode
 			map.setMapType(map.getMapTypes()[2])
@@ -21,6 +53,14 @@
 			map.enableScrollWheelZoom()
 		}
 	//});
+	
+	{% for e in entries %}
+	(function() {
+		var mark = new GMarker(new GLatLng({{ e.supply_place.location.latitude }}, {{ e.supply_place.location.longitude }}))
+		mark.bindInfoWindow($("entry-{{ e.pk }}"))
+		map.addOverlay(mark)
+	})();
+	{% endfor %}
 	
 	// garbage collection for dumb browsers
 	$(document.body).addEvent("unload", GUnload);

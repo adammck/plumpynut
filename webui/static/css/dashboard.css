@@ -122,6 +122,30 @@
 
 	.dashboard #content .export-form select.fields { display: none; }
 	.dashboard #content .export-form select.fields.visible { display: inline; }
+	
+	/* expand the "field" column as much as
+	 * possible, to wrap other columns tightly */
+	.dashboard .export-form td.field {
+		width: 100%; }
+	
+	.dashboard .export-form td.deletelink {
+		background-position: 50% 50%;
+		cursor: pointer;
+	}
+	
+	.dashboard .export-form .export-button {
+		float: right; }
+		
+	.dashboard .export-form tfoot td {
+		text-align: center;
+		padding: 5px;
+	}
+		
+	.dashboard .export-form tfoot td#export-add-filter {
+		text-align: center;
+		cursor: pointer;
+		padding: 4px;
+	}
 
 
 

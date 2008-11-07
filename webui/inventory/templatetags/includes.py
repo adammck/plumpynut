@@ -2,6 +2,7 @@
 # vim: noet
 
 from datetime import datetime, timedelta
+from shared import *
 import fpformat
 
 from inventory.models import *
@@ -149,3 +150,41 @@ def incl_notifications():
 		"caption": "Unresolved Notifications",
 		"notifications": Notification.objects.filter(resolved=False).order_by("-time")
 	}
+
+@register.inclusion_tag("period.html")
+def incl_reporting_period():
+	start, end = current_reporting_period()
+	return { "start": start, "end": end }
+
+@register.inclusion_tag("export-form.html", takes_context=True)
+def incl_export_form(context):
+	from django.utils.text import capfirst
+	from django.utils.html import escape
+	from django.contrib import admin
+	
+	def no_auto_fields(field):
+		from django.db import models
+		return not isinstance(field, models.AutoField)
+	
+	models = []	
+	for model, m_admin in admin.site._registry.items():
+		
+		# fetch ALL fields (including those nested via
+		# foreign keys) for this model, via shared.py
+		fields = [
+			
+			# you'd never guess that i was a perl programmer...
+			{ "caption": escape(capt), "name": name, "help_text": field.help_text }
+			for name, capt, field in filter(no_auto_fields, nested_fields(model))]
+		
+		# pass model metadata and fields array
+		# to the template to be rendered
+		models.append({
+			"caption": capfirst(model._meta.verbose_name_plural),
+			"name":    model.__name__.lower(),
+			"app_label": model._meta.app_label,
+			"fields": fields
+		})
+	
+	return {"models": models}
+
