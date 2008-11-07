@@ -87,14 +87,15 @@ body {
 	}
 
 	#content .module {
-		border: none;
-		margin-bottom: 15px;
+		margin-bottom: 30px;
+		border: 0;
 	}
 
 	#content .module h2,
 	#content .module caption,
 	#content .inline-group h2 {
 		background: #74d7e3 url("../png/h2.png") repeat-x;
+		border-top: 1px solid #38b0dd;
 	}
 
 	/* add space between
