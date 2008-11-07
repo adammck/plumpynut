@@ -82,12 +82,12 @@ admin.site.register(Area, AreaAdmin)
 admin.site.register(Zone, ZoneAdmin)
 admin.site.register(Region, RegionAdmin)
 admin.site.register(Location, LocationAdmin)
-admin.site.register(SupplyPlace, SupplyPlaceAdmin)
+#admin.site.register(SupplyPlace, SupplyPlaceAdmin)
 admin.site.register(Notification, NotificationAdmin)
-admin.site.register(Report, ReportAdmin)
+#admin.site.register(Report, ReportAdmin)
 admin.site.register(Entry, EntryAdmin)
 
 # temporarily, allow the message logs
 # to be altered, to remove testing junk
-admin.site.register(Transaction)
+#admin.site.register(Transaction)
 
