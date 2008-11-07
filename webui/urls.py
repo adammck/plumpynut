@@ -11,6 +11,9 @@ admin.autodiscover()
 urlpatterns = patterns("",
     (r'^assets/(?P<path>.*)$', "django.views.static.serve",
         {"document_root": os.path.dirname(__file__) + "/static"}),
+
+    (r'^graphs/(?P<path>.*)$', "django.views.static.serve",
+        {"document_root": os.path.dirname(__file__) + "/graphs"}),
     
 	(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to',
 		{'url': '/assets/favicon.ico'}),
