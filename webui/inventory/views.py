@@ -105,9 +105,10 @@ def graph_entries(num_days=14):
 		dates.append(d.day)
 		counts.append(count)
     
-    	line = SimpleLineChart(400, 100, y_range=(0, 100))
+    	line = SimpleLineChart(440, 100, y_range=(0, 100))
 	line.add_data(counts)
 	line.set_axis_labels(Axis.BOTTOM, dates)
+	line.set_axis_labels(Axis.BOTTOM, ['','Date', ''])
 	line.set_axis_labels(Axis.LEFT, ['', 50, 100])
 	line.set_colours(['0091C7'])
 	line.download('webui/graphs/entries.png')
@@ -125,7 +126,7 @@ def graph_monitors(num_days=14):
 			if m.latest_report.time.date() > (datetime.today().date() - day_range):
 				reported += 1
 
-	chart = PieChart2D(300, 100)
+	chart = PieChart2D(275, 60)
 	chart.add_data([(len(mons)-reported), reported])
 	#chart.set_pie_labels(['', 'Reporting Monitors'])
 	chart.set_legend(['Non-reporting Monitors', 'Reporting Monitors'])
@@ -147,7 +148,7 @@ def graph_otps():
 	percent_visited = float(visited)/float(otps)
 	percent_not_visited = float(otps - visited)/float(otps)
 
-	chart = PieChart2D(300, 100)
+	chart = PieChart2D(275, 60)
 	chart.add_data([(percent_not_visited*100), (percent_visited*100)])
 	#chart.set_pie_labels(['', 'Visited OTPs'])
 	chart.set_legend(['Non-visited OTPs', 'Visited OTPs'])
@@ -254,7 +255,7 @@ def graph_avg_stat():
 	w_c = (float(w_c)/float(w_num))
 	w_s = (float(w_s)/float(w_num))
 
-	pie = PieChart2D(300, 100)
+	pie = PieChart2D(275, 60)
 	pie.add_data([(d_n*100), (d_a*100)])
 	#pie.set_pie_labels(['', 'Avg visited OTPs per woreda'])
 	pie.set_legend(['Avg non-visted OTPs per woreda', 'Avg visited OTPs per woreda'])
